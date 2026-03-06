@@ -47,4 +47,6 @@ Route::view('/about', 'pages.about')->name('about');
 Route::view('/features', 'pages.features')->name('features');
 Route::view('/support', 'pages.support')->name('support');
 
+Route::get('/admin/roles', [App\Http\Controllers\Admin\RoleController::class, 'index'])->name('admin.roles.index');
+Route::post('/admin/roles/update', [App\Http\Controllers\Admin\RoleController::class, 'update'])->name('admin.roles.update');
 require __DIR__.'/auth.php';
