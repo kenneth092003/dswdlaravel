@@ -11,10 +11,13 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // siguraduhin na may role na Super Admin
-        Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
+        // Ensure the Super Admin role exists
+        Role::firstOrCreate([
+            'name'       => 'Superadmin',
+            'guard_name' => 'web'
+        ]);
 
-        // gumawa ng default Super Admin user
+        // Create the default Super Admin user
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
@@ -24,11 +27,11 @@ class SuperAdminSeeder extends Seeder
                 'password'    => Hash::make('password'),
                 'is_approved' => true,
                 'approved_at' => now(),
-                'role'        => 'Super Admin',
+                'role'        => 'Superadmin',
             ]
         );
 
-        // assign role sa Spatie
-        $admin->assignRole('Super Admin');
+        // Assign role via Spatie
+        $admin->assignRole('Superadmin');
     }
 }
