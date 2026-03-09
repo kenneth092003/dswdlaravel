@@ -12,11 +12,16 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        // Auto-assign Spatie role from users.role column if not yet assigned
+        if ($user->role && $user->getRoleNames()->isEmpty()) {
+            $user->assignRole($user->role);
+        }
+
         if ($user->hasRole('Super Admin')) {
             return redirect()->route('admin.users.index');
         }
 
-        if ($user->hasRole('FAII')) {
+        if ($user->hasRole('FA II')) {
             return redirect()->route('faii.dashboard');
         }
 
@@ -36,7 +41,6 @@ class DashboardController extends Controller
             return redirect()->route('enduser.dashboard');
         }
 
-        // Fallback — no role assigned
         return view('dashboard');
     }
 }

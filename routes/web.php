@@ -54,7 +54,7 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 // -------------------------------------------------------
 // FAII Routes
 // -------------------------------------------------------
-Route::middleware(['auth', 'role:FAII'])->group(function () {
+Route::middleware(['auth', 'role:FA II'])->group(function () {
     Route::get('/faii/dashboard', [FAIIDashboardController::class, 'index'])->name('faii.dashboard');
 });
 
