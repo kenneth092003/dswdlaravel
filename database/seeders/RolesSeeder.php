@@ -5,29 +5,36 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure roles exist
-        foreach (['Superadmin','Enduser','Budget','Cash','FAII','Procurement'] as $r) {
-            Role::firstOrCreate(['name' => $r]);
+        // ✅ Delete old incorrect role names
+        Role::whereIn('name', ['Superadmin', 'Enduser', 'FAII', 'End-user', 'Budget', 'Cash'])
+            ->delete();
+
+        // ✅ Create correct role names (must match exactly what the code checks)
+        foreach (['Super Admin', 'End User', 'Procurement', 'FA II'] as $r) {
+            Role::firstOrCreate(['name' => $r, 'guard_name' => 'web']);
         }
 
-        // Find YOUR existing user and make them Superadmin
-        $user = User::where('email', 'kinley.cartagenas@hcdc.edu.ph')->first();
+        // ✅ Create or find the default Super Admin user
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'firstname'   => 'System',
+                'lastname'    => 'Administrator',
+                'employee_id' => '000001',
+                'password'    => Hash::make('password'),
+                'is_approved' => true,
+                'approved_at' => now(),
+                'role'        => 'Super Admin',
+            ]
+        );
 
-        if (! $user) {
-            // If user doesn't exist yet, stop with a clear message
-            $this->command?->error('User kinley.cartagenas@hcdc.edu.ph not found in users table.');
-            return;
-        }
-
-        // Make Superadmin (syncRoles replaces any existing roles) [web:124]
-        $user->syncRoles(['Superadmin']); // [web:124]
-
-        // If you want to keep existing roles and just add Superadmin, use this instead: [web:124]
-        // $user->assignRole('Superadmin'); // [web:124]
+        // ✅ Assign Spatie role — this is what getRoleNames() reads
+        $admin->syncRoles(['Super Admin']);
     }
 }
