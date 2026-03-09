@@ -12,31 +12,44 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        if ($user->hasRole('Super Admin')) {
-            return redirect()->route('admin.users.index');
+        // Block unapproved users
+        if (! $user->is_approved) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Your account is pending approval by an administrator.']);
         }
 
-        if ($user->hasRole('FAII')) {
+        // ✅ Super Admin → loads superadmin dashboard view
+        if ($user->hasRole('Super Admin')) {
+            return view('dashboard.superadmin');
+        }
+
+        // ✅ FA II
+        if ($user->hasRole('FA II')) {
             return redirect()->route('faii.dashboard');
         }
 
+        // ✅ Budget
         if ($user->hasRole('Budget')) {
             return redirect()->route('budget.dashboard');
         }
 
+        // ✅ Cash
         if ($user->hasRole('Cash')) {
             return redirect()->route('cash.dashboard');
         }
 
+        // ✅ Procurement
         if ($user->hasRole('Procurement')) {
             return redirect()->route('procurement.dashboard');
         }
 
-        if ($user->hasRole('Enduser')) {
+        // ✅ End User
+        if ($user->hasRole('End User')) {
             return redirect()->route('enduser.dashboard');
         }
 
-        // Fallback — no role assigned
+        // Fallback
         return view('dashboard');
     }
 }
