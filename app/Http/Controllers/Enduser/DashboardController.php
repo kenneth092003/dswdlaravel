@@ -1,41 +1,42 @@
 <?php
 
-namespace App\Http\Controllers\EndUser;
+namespace App\Http\Controllers\Enduser;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\PurchaseRequest;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $userId = Auth::id();
 
-        $total = PurchaseRequest::where('user_id', $user->id)->count();
-
-        $pending = PurchaseRequest::where('user_id', $user->id)
-            ->where('status', 'submitted')
-            ->count();
-
-        $approved = PurchaseRequest::where('user_id', $user->id)
-            ->where('status', 'approved')
-            ->count();
-
-        $draft = PurchaseRequest::where('user_id', $user->id)
+        $draftCount = PurchaseRequest::where('user_id', $userId)
             ->where('status', 'draft')
             ->count();
 
-        $requests = PurchaseRequest::where('user_id', $user->id)
+        $pendingCount = PurchaseRequest::where('user_id', $userId)
+            ->whereIn('status', ['pending', 'submitted_to_rd'])
+            ->count();
+
+        $approvedProcessingCount = PurchaseRequest::where('user_id', $userId)
+            ->whereIn('status', ['approved', 'processing', 'bac_processing', 'signed_pr', 'validated_payment'])
+            ->count();
+
+        $returnedRejectedCount = PurchaseRequest::where('user_id', $userId)
+            ->whereIn('status', ['returned', 'rejected'])
+            ->count();
+
+        $requests = PurchaseRequest::where('user_id', $userId)
             ->latest()
-            ->take(5)
             ->get();
 
         return view('enduser.dashboard', compact(
-            'total',
-            'pending',
-            'approved',
-            'draft',
+            'draftCount',
+            'pendingCount',
+            'approvedProcessingCount',
+            'returnedRejectedCount',
             'requests'
         ));
     }
