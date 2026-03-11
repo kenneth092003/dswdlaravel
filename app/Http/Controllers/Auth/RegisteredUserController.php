@@ -15,50 +15,40 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'firstname'   => ['required', 'string', 'max:255'],
-        'lastname'    => ['required', 'string', 'max:255'],
-        'employee_id' => ['required', 'string', 'max:50', 'unique:users,employee_id'],
-        'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-        'password'    => ['required', 'confirmed', Rules\Password::defaults()],
-        'role'        => ['required', Rule::in(['End-user','Procurement','FA II','Super Admin'])],
-    ]); // validation rules like email/unique and Rule::in are standard Laravel validation features [web:276]
+    {
+        $request->validate([
+            'firstname'   => ['required', 'string', 'max:255'],
+            'lastname'    => ['required', 'string', 'max:255'],
+            'employee_id' => ['required', 'string', 'max:50', 'unique:users,employee_id'],
+            'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password'    => ['required', 'confirmed', Rules\Password::defaults()],
+            // ✅ Fixed: exact Spatie role names (no hyphen, correct spacing)
+            'role'        => ['required', Rule::in(['End User', 'Procurement', 'FA II'])],
+        ]);
 
-    $user = User::create([
-    'employee_id' => $request->employee_id,
-    'firstname'   => $request->firstname,
-    'lastname'    => $request->lastname,
-    'email'       => $request->email,
-    'password'    => Hash::make($request->password),
-    'is_approved' => false,
-    'approved_at' => null,
-    'role'        => $request->role, // ✅ dito na papasok yung pinili sa dropdown
-]);
+        $user = User::create([
+            'employee_id' => $request->employee_id,
+            'firstname'   => $request->firstname,
+            'lastname'    => $request->lastname,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'is_approved' => false,
+            'approved_at' => null,
+            'role'        => $request->role,
+        ]);
 
-$user->assignRole($request->role);
+        // ✅ Assign Spatie role using exact role name
+        $user->assignRole($request->role);
 
-event(new Registered($user));
+        event(new Registered($user));
 
-return redirect()->route('login')
-    ->with('status', 'Registration successful. Your account is pending approval.');
-
-    return redirect(route('dashboard', absolute: false));
-}
-
-
+        return redirect()->route('login')
+            ->with('status', 'Registration successful. Your account is pending approval.');
+    }
 }

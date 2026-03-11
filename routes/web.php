@@ -50,11 +50,11 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Superadmin Routes
+| Superadmin Routes — ✅ Fixed: 'role:Super Admin'
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:Superadmin'])
+Route::middleware(['auth', 'role:Super Admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -71,11 +71,11 @@ Route::middleware(['auth', 'role:Superadmin'])
 
 /*
 |--------------------------------------------------------------------------
-| FA II Routes
+| FA II Routes — ✅ Fixed: 'role:FA II'
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:FAII'])->prefix('faii')->name('faii.')->group(function () {
+Route::middleware(['auth', 'role:FA II'])->prefix('faii')->name('faii.')->group(function () {
     Route::get('/dashboard', [FAIIDashboardController::class, 'index'])->name('dashboard');
 });
 
@@ -114,11 +114,11 @@ Route::middleware(['auth', 'role:Procurement'])
 
 /*
 |--------------------------------------------------------------------------
-| Enduser Routes
+| Enduser Routes — ✅ Fixed: 'role:End User'
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:Enduser'])
+Route::middleware(['auth', 'role:End User'])
     ->prefix('enduser')
     ->name('enduser.')
     ->group(function () {
