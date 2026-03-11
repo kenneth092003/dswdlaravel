@@ -2,16 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        /** @var User|null $user */
+        $user = Auth::user();
 
-        if ($user->hasRole('Super Admin')) {
-            return view('dashboard.superadmin');
+        if (! $user) {
+            return redirect()->route('login');
         }
 
-        return view('dashboard.default');
+        if ($user->hasRole('Superadmin')) {
+            return redirect()->route('admin.users.index');
+        }
+
+        if ($user->hasRole('Enduser')) {
+            return redirect()->route('enduser.dashboard');
+        }
+
+        abort(403, 'Unauthorized.');
     }
 }

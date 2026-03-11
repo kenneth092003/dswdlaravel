@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,11 +26,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // This will attempt login using your current LoginRequest (email/password)
         $request->authenticate();
 
-        // Block access if pending approval (only triggers after correct credentials)
-        if (! Auth::user()->is_approved) {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (! $user || ! $user->is_approved) {
             Auth::guard('web')->logout();
 
             $request->session()->invalidate();
@@ -37,14 +39,21 @@ class AuthenticatedSessionController extends Controller
 
             throw ValidationException::withMessages([
                 'email' => 'Your account is pending approval.',
-            ]); // show error under the email field [web:435]
+            ]);
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
-    }
+        if ($user->role === 'Enduser') {
+            return redirect()->route('enduser.dashboard');
+        }
 
+        if ($user->role === 'Superadmin') {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('dashboard');
+    }
     /**
      * Destroy an authenticated session.
      */
