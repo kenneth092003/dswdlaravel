@@ -19,11 +19,9 @@
             --danger:#e57f7f;
         }
 
-        *{box-sizing:border-box}
+        *{box-sizing:border-box;margin:0;padding:0;}
 
         html, body{
-            margin:0;
-            padding:0;
             width:100%;
             height:100%;
             font-family:Arial, Helvetica, sans-serif;
@@ -38,9 +36,6 @@
         .app-shell{
             width:100%;
             min-height:100vh;
-            border:0;
-            background:#f7f8fb;
-            box-shadow:none;
             display:flex;
             flex-direction:column;
         }
@@ -49,6 +44,7 @@
             height:12px;
             background:var(--blue);
             width:100%;
+            flex-shrink:0;
         }
 
         .topbar{
@@ -59,6 +55,7 @@
             justify-content:space-between;
             padding:10px 18px;
             width:100%;
+            flex-shrink:0;
         }
 
         .brand-wrap{
@@ -109,7 +106,7 @@
             flex:1;
             min-height:0;
             width:100%;
-            background:#f5f6f9;
+            height:calc(100vh - 90px);
         }
 
         .sidebar{
@@ -119,6 +116,10 @@
             border-right:1px solid var(--border);
             display:flex;
             flex-direction:column;
+            height:100%;
+            position:sticky;
+            top:0;
+            overflow-y:auto;
         }
 
         .sidebar-title{
@@ -133,6 +134,7 @@
 
         .menu-section{
             padding:0 12px 14px;
+            flex:1;
         }
 
         .menu-label{
@@ -157,17 +159,19 @@
         }
 
         .sidebar-bottom{
-            margin-top:auto;
             padding:12px;
             font-size:13px;
             color:#4a5562;
+            border-top:1px solid var(--border);
+            background:#e8eaed;
         }
 
         .main{
             flex:1;
             min-width:0;
             padding:10px 12px 18px;
-            overflow:auto;
+            overflow-y:auto;
+            height:100%;
         }
 
         .stats{
@@ -411,6 +415,7 @@
             font-weight:700;
             font-size:20px;
             line-height:1;
+            cursor:pointer;
         }
 
         .steps{
@@ -611,9 +616,10 @@
             .stats{ grid-template-columns:repeat(2,1fr); }
             .grid-3{ grid-template-columns:1fr; }
             .grid-2{ grid-template-columns:1fr; }
-            .content-shell{ flex-direction:column; }
-            .sidebar{ width:100%; min-width:100%; }
+            .content-shell{ flex-direction:column; height:auto; }
+            .sidebar{ width:100%; min-width:100%; height:auto; position:relative; }
             .sidebar-title{ border-radius:0; width:100%; }
+            .main{ height:auto; }
         }
     </style>
 </head>
@@ -664,7 +670,24 @@
                     <a href="{{ route('enduser.profile.edit') }}" class="menu-link {{ request()->routeIs('enduser.profile.*') ? 'active' : '' }}">Profile</a>
                 </div>
 
-                <div class="sidebar-bottom">Logout</div>
+                {{-- ✅ Fixed: Working logout with user info --}}
+                <div class="sidebar-bottom">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                        <div style="width:32px;height:32px;border-radius:50%;background:var(--blue-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">
+                            {{ strtoupper(substr(auth()->user()->firstname, 0, 1) . substr(auth()->user()->lastname, 0, 1)) }}
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:13px;">{{ auth()->user()->firstname }} {{ auth()->user()->lastname }}</div>
+                            <div style="font-size:11px;color:#9aa3ad;">{{ auth()->user()->email }}</div>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" style="width:100%;background:#c53030;color:#fff;border:none;border-radius:7px;padding:8px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.3px;">
+                            🔓 Logout
+                        </button>
+                    </form>
+                </div>
             </aside>
 
             <main class="main">
@@ -687,4 +710,4 @@
         </div>
     </div>
 </body>
-</html> fix it full screen all of the pages and dashboard end user do not use canmore just directly reply here 
+</html>
