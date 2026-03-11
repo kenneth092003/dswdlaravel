@@ -16,15 +16,23 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
-        if ($user->hasRole('Superadmin')) {
-            return redirect()->route('admin.users.index');
+        // Block unapproved users
+        if (! $user->is_approved) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Your account is pending approval by an administrator.']);
         }
 
-        if ($user->hasRole('Enduser')) {
+        // ✅ Fixed role names to match DB exactly
+        if ($user->hasRole('Super Admin')) {
+            return view('dashboard.superadmin');
+        }
+
+        if ($user->hasRole('End User')) {
             return redirect()->route('enduser.dashboard');
         }
 
-        if ($user->hasRole('FAII')) {
+        if ($user->hasRole('FA II')) {
             return redirect()->route('faii.dashboard');
         }
 
