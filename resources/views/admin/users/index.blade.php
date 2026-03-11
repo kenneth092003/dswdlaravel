@@ -71,27 +71,33 @@
 
             {{-- Tab navigation --}}
             <div class="tab-nav flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm w-full overflow-x-auto">
-                <a href="/dashboard" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
-    <div class="font-bold">Overview</div>
-    <div class="text-xs font-normal text-gray-400">System snapshot</div>
-</a>
+
+                {{-- ✅ Fixed: no duplicate </a>, using route() --}}
+                <a href="{{ route('dashboard') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+                    <div class="font-bold">Overview</div>
+                    <div class="text-xs font-normal text-gray-400">System snapshot</div>
                 </a>
+
                 <a href="{{ route('admin.users.index') }}" class="active flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold transition">
                     <div class="font-bold">Account Management</div>
                     <div class="text-xs font-normal opacity-80">Users &amp; accounts</div>
                 </a>
+
                 <a href="{{ route('admin.roles.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Permission Control</div>
                     <div class="text-xs font-normal text-gray-400">Roles &amp; access</div>
                 </a>
+
                 <a href="{{ route('admin.settings.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">System Oversight</div>
                     <div class="text-xs font-normal text-gray-400">Settings &amp; health</div>
                 </a>
+
                 <a href="{{ route('admin.reports.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Audit Logs</div>
                     <div class="text-xs font-normal text-gray-400">Activity trail</div>
                 </a>
+
             </div>
 
             {{-- Table card --}}
