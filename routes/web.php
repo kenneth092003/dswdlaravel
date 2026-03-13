@@ -110,6 +110,9 @@ Route::middleware(['auth', 'role:Procurement'])
     ->name('procurement.')
     ->group(function () {
         Route::get('/dashboard', [ProcurementDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/step1', [ProcurementDashboardController::class, 'step1'])->name('step1');
+        Route::get('/step2', [ProcurementDashboardController::class, 'step2'])->name('step2');
+        Route::get('/step3', [ProcurementDashboardController::class, 'step3'])->name('step3');
     });
 
 /*
