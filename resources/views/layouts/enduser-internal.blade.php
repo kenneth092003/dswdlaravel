@@ -56,6 +56,7 @@
             padding:10px 18px;
             width:100%;
             flex-shrink:0;
+            gap:14px;
         }
 
         .brand-wrap{
@@ -95,10 +96,76 @@
             margin-top:2px;
         }
 
+        .topbar-right{
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-left:auto;
+        }
+
         .bell{
             font-size:28px;
             color:#222;
             line-height:1;
+        }
+
+        .user-topbar{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            background:#ffffff;
+            border:1px solid #d4dae2;
+            border-radius:10px;
+            padding:6px 10px;
+        }
+
+        .user-avatar{
+            width:34px;
+            height:34px;
+            border-radius:50%;
+            background:var(--blue-dark);
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:12px;
+            font-weight:700;
+            flex-shrink:0;
+        }
+
+        .user-details{
+            display:flex;
+            flex-direction:column;
+            line-height:1.2;
+        }
+
+        .user-name{
+            font-weight:700;
+            font-size:13px;
+            color:#263238;
+        }
+
+        .user-email{
+            font-size:11px;
+            color:#7b8794;
+        }
+
+        .logout-btn-top{
+            background:#c53030;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            padding:9px 14px;
+            font-size:12px;
+            font-weight:700;
+            cursor:pointer;
+            letter-spacing:0.3px;
+        }
+
+        .logout-btn-top:hover{
+            background:#a92828;
         }
 
         .content-shell{
@@ -156,14 +223,6 @@
         .menu-link.active{
             color:var(--blue-dark);
             font-weight:700;
-        }
-
-        .sidebar-bottom{
-            padding:12px;
-            font-size:13px;
-            color:#4a5562;
-            border-top:1px solid var(--border);
-            background:#e8eaed;
         }
 
         .main{
@@ -621,6 +680,34 @@
             .sidebar-title{ border-radius:0; width:100%; }
             .main{ height:auto; }
         }
+
+        @media (max-width: 768px){
+            .topbar{
+                flex-direction:column;
+                align-items:flex-start;
+            }
+
+            .topbar-right{
+                width:100%;
+                justify-content:space-between;
+            }
+
+            .user-topbar{
+                max-width:100%;
+            }
+
+            .user-details{
+                overflow:hidden;
+            }
+
+            .user-name,
+            .user-email{
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                max-width:160px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -640,10 +727,30 @@
                 <div style="width:1px;height:52px;background:#c8ccd1;margin:0 8px;"></div>
                 <div class="brand-text">
                     <small>Internal System</small>
-                    <strong>Procurement Management System</strong>
+                    <strong>Purchase Tracking System</strong>
                 </div>
             </div>
-            <div class="bell">🔔</div>
+
+            <div class="topbar-right">
+                <div class="bell">🔔</div>
+
+                @auth
+                <div class="user-topbar">
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(auth()->user()->firstname, 0, 1) . substr(auth()->user()->lastname, 0, 1)) }}
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{ auth()->user()->firstname }} {{ auth()->user()->lastname }}</div>
+                        <div class="user-email">{{ auth()->user()->email }}</div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-btn-top">🔓 Logout</button>
+                </form>
+                @endauth
+            </div>
         </div>
 
         <div class="content-shell">
@@ -657,8 +764,6 @@
                     <div class="menu-label">Activity Proposals</div>
                     <a href="{{ route('enduser.requests.create') }}" class="menu-link {{ request()->routeIs('enduser.requests.create') ? 'active' : '' }}">New Activity Proposal</a>
                     <a href="{{ route('enduser.requests.index') }}" class="menu-link {{ request()->routeIs('enduser.requests.index') ? 'active' : '' }}">My Proposals</a>
-                    <a href="{{ route('enduser.requests.index', ['filter' => 'pending']) }}" class="menu-link">Pending Approval</a>
-                    <a href="{{ route('enduser.requests.index', ['filter' => 'returned']) }}" class="menu-link">Returned / Rejected</a>
 
                     <div class="menu-label">Documents</div>
                     <a href="{{ route('enduser.requests.index') }}" class="menu-link">Purchase Requests</a>
@@ -668,25 +773,6 @@
                     <div class="menu-label">Account</div>
                     <a href="{{ route('enduser.notifications.index') }}" class="menu-link {{ request()->routeIs('enduser.notifications.*') ? 'active' : '' }}">Notifications</a>
                     <a href="{{ route('enduser.profile.edit') }}" class="menu-link {{ request()->routeIs('enduser.profile.*') ? 'active' : '' }}">Profile</a>
-                </div>
-
-                {{-- ✅ Fixed: Working logout with user info --}}
-                <div class="sidebar-bottom">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                        <div style="width:32px;height:32px;border-radius:50%;background:var(--blue-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">
-                            {{ strtoupper(substr(auth()->user()->firstname, 0, 1) . substr(auth()->user()->lastname, 0, 1)) }}
-                        </div>
-                        <div>
-                            <div style="font-weight:700;font-size:13px;">{{ auth()->user()->firstname }} {{ auth()->user()->lastname }}</div>
-                            <div style="font-size:11px;color:#9aa3ad;">{{ auth()->user()->email }}</div>
-                        </div>
-                    </div>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" style="width:100%;background:#c53030;color:#fff;border:none;border-radius:7px;padding:8px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.3px;">
-                            🔓 Logout
-                        </button>
-                    </form>
                 </div>
             </aside>
 

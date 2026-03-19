@@ -23,82 +23,472 @@
             --card:    rgba(255,255,255,0.04);
         }
 
-        body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; display: flex; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
 
-        /* SIDEBAR */
-        .sidebar { width: 220px; min-height: 100vh; background: var(--navy2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-brand { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
-        .sidebar-brand .app-name { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; }
-        .sidebar-brand .app-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+        .sidebar {
+            width: 220px;
+            min-height: 100vh;
+            background: var(--navy2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-brand .app-name {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .sidebar-brand .app-sub {
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
         .nav-section { padding: 20px 12px 6px; }
-        .nav-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 400; color: #94a3b8; cursor: pointer; transition: all 0.15s; text-decoration: none; margin-bottom: 2px; }
-        .nav-item:hover { background: var(--card); color: var(--text); }
-        .nav-item.active { background: rgba(59,130,246,0.15); color: var(--accent); font-weight: 500; }
-        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-        .badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; font-family: 'DM Mono', monospace; }
 
-        .logout-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 400; color: #94a3b8; cursor: pointer; transition: all 0.15s; background: none; border: none; font-family: 'DM Sans', sans-serif; text-align: left; }
-        .logout-btn:hover { background: rgba(239,68,68,0.1); color: var(--red); }
-        .logout-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            text-transform: uppercase;
+            padding: 0 8px;
+            margin-bottom: 6px;
+        }
 
-        .sidebar-footer { margin-top: auto; padding: 16px 12px; border-top: 1px solid var(--border); }
-        .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--card); margin-bottom: 10px; }
-        .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; }
-        .user-info .name { font-size: 13px; font-weight: 500; color: var(--text); }
-        .user-info .role-tag { font-size: 11px; color: var(--accent); font-weight: 500; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 400;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+            margin-bottom: 2px;
+        }
 
-        /* MAIN */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; background: var(--navy2); flex-shrink: 0; }
-        .breadcrumb { font-size: 12px; color: var(--muted); }
-        .breadcrumb span { color: var(--text); font-weight: 500; }
-        .page-title { font-size: 15px; font-weight: 600; color: var(--text); }
-        .topbar-right { display: flex; align-items: center; gap: 14px; }
-        .topbar-user { font-size: 13px; color: var(--text); font-weight: 500; text-align: right; }
-        .topbar-role { font-size: 11px; color: var(--accent); }
+        .nav-item:hover {
+            background: var(--card);
+            color: var(--text);
+        }
 
-        /* STEPS */
-        .steps-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding: 0 0 8px; border-bottom: 1px solid var(--border); }
-        .step-tab { padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid transparent; color: var(--muted); font-size: 12px; font-weight: 500; cursor: default; display: flex; align-items: center; gap: 8px; }
-        .step-tab.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.25); color: var(--accent); }
-        .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.08); font-size: 11px; font-weight: 600; color: var(--text); }
+        .nav-item.active {
+            background: rgba(59,130,246,0.15);
+            color: var(--accent);
+            font-weight: 500;
+        }
 
-        /* DASHBOARD CONTENT */
+        .nav-item svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 400;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            text-align: left;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239,68,68,0.1);
+            color: var(--red);
+        }
+
+        .logout-btn svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: var(--card);
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .user-info .name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .user-info .role-tag {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 60px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            background: var(--navy2);
+            flex-shrink: 0;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .breadcrumb span {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .topbar-user {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .topbar-role {
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .steps-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 0 0 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step-tab {
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid transparent;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-tab.active {
+            background: rgba(59,130,246,0.15);
+            border-color: rgba(59,130,246,0.25);
+            color: var(--accent);
+        }
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
         .content-inner { padding: 28px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 28px; }
-        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; position: relative; overflow: hidden; transition: transform 0.15s, border-color 0.15s; }
-        .stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.14); }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
-        .stat-card.blue::before  { background: var(--accent); }
-        .stat-card.gold::before  { background: var(--gold); }
-        .stat-card.green::before { background: var(--green); }
-        .stat-card.red::before   { background: var(--red); }
-        .stat-card.purple::before{ background: var(--purple); }
-        .stat-number { font-size: 32px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 6px; }
-        .stat-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 
-        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .section-title { font-size: 14px; font-weight: 600; color: var(--text); }
-        .search-box { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 12.5px; color: var(--muted); }
-        .search-box svg { width: 14px; height: 14px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
-        .tab { padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid transparent; color: var(--muted); font-size: 12px; font-weight: 500; cursor: default; }
-        .tab.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.25); color: var(--accent); }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s, border-color 0.15s;
+        }
 
-        .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        thead tr { background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); }
-        th { padding: 12px 18px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: left; }
-        td { padding: 14px 18px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.14);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .stat-card.blue::before   { background: var(--accent); }
+        .stat-card.gold::before   { background: var(--gold); }
+        .stat-card.green::before  { background: var(--green); }
+        .stat-card.red::before    { background: var(--red); }
+        .stat-card.purple::before { background: var(--purple); }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12.5px;
+            color: var(--muted);
+        }
+
+        .search-box svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .tab {
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid transparent;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: rgba(59,130,246,0.15);
+            border-color: rgba(59,130,246,0.25);
+            color: var(--accent);
+        }
+
+        .table-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 12px 18px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: left;
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 13px;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
         tr:last-child td { border-bottom: none; }
-        tbody tr { transition: background 0.12s; }
-        tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-        .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
-        .empty-text { font-size: 13px; }
+        tbody tr {
+            transition: background 0.12s;
+        }
+
+        tbody tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-submitted_to_procurement,
+        .status-bac_processing {
+            background: rgba(59,130,246,0.15);
+            color: #93c5fd;
+        }
+
+        .status-canvassing {
+            background: rgba(245,158,11,0.15);
+            color: #fcd34d;
+        }
+
+        .status-abstract_preparation {
+            background: rgba(16,185,129,0.15);
+            color: #6ee7b7;
+        }
+
+        .status-po_generation {
+            background: rgba(239,68,68,0.15);
+            color: #fca5a5;
+        }
+
+        .status-completed {
+            background: rgba(139,92,246,0.15);
+            color: #c4b5fd;
+        }
+
+        .action-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
+
+        .empty-text {
+            font-size: 13px;
+        }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -107,7 +497,6 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
     <div class="sidebar-brand">
         <div class="app-name">PROMIS v5</div>
@@ -127,7 +516,7 @@
         <a href="{{ route('procurement.step1') }}" class="nav-item {{ request()->routeIs('procurement.step1') ? 'active' : '' }}">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h6M5 6h14M5 18h14"/></svg>
             Activity Proposals
-            <span class="badge">0</span>
+            <span class="badge">{{ $forApprovalCount ?? 0 }}</span>
         </a>
     </div>
 
@@ -136,7 +525,7 @@
         <a href="{{ route('procurement.step2') }}" class="nav-item {{ request()->routeIs('procurement.step2') ? 'active' : '' }}">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
             Incoming PR
-            <span class="badge">0</span>
+            <span class="badge">{{ $incomingCount ?? 0 }}</span>
         </a>
     </div>
 
@@ -169,7 +558,6 @@
             </div>
         </div>
 
-        {{-- Breeze Logout --}}
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="logout-btn">
@@ -180,10 +568,7 @@
     </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
-
-    <!-- TOP BAR -->
     <div class="topbar">
         <div>
             <div class="breadcrumb">Procurement › <span>Step 2</span></div>
@@ -220,29 +605,28 @@
 
         <div class="stats-grid">
             <div class="stat-card blue">
-                <div class="stat-number">0</div>
+                <div class="stat-number">{{ $incomingCount ?? 0 }}</div>
                 <div class="stat-label">Incoming PR</div>
-                {{-- /* TODO: Retrieve BAC processing statistics from procurement tables */ --}}
             </div>
+
             <div class="stat-card gold">
-                <div class="stat-number">0</div>
+                <div class="stat-number">{{ $canvassingCount ?? 0 }}</div>
                 <div class="stat-label">Canvassing</div>
-                {{-- /* TODO: Retrieve BAC processing statistics from procurement tables */ --}}
             </div>
+
             <div class="stat-card green">
-                <div class="stat-number">0</div>
+                <div class="stat-number">{{ $abstractCount ?? 0 }}</div>
                 <div class="stat-label">Abstract Prep</div>
-                {{-- /* TODO: Retrieve BAC processing statistics from procurement tables */ --}}
             </div>
+
             <div class="stat-card red">
-                <div class="stat-number">0</div>
+                <div class="stat-number">{{ $poGenerationCount ?? 0 }}</div>
                 <div class="stat-label">PO Generation</div>
-                {{-- /* TODO: Retrieve BAC processing statistics from procurement tables */ --}}
             </div>
+
             <div class="stat-card purple">
-                <div class="stat-number">0</div>
+                <div class="stat-number">{{ $completedCount ?? 0 }}</div>
                 <div class="stat-label">Completed</div>
-                {{-- /* TODO: Retrieve BAC processing statistics from procurement tables */ --}}
             </div>
         </div>
 
@@ -250,7 +634,7 @@
             <div class="section-title">BAC Processing Queue</div>
             <div class="search-box">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                Search by PR number or title...
+                Showing {{ $purchaseRequests->count() ?? 0 }} request(s)
             </div>
         </div>
 
@@ -277,12 +661,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- /* TODO: Populate BAC queue from procurement processing tables */ --}}
+                    @forelse($purchaseRequests as $pr)
+                        <tr>
+                            <td>{{ $pr->pr_number ?? $pr->document_no ?? ('PR-' . $pr->id) }}</td>
+                            <td>{{ $pr->title ?? $pr->purpose ?? $pr->description ?? 'Untitled Request' }}</td>
+                            <td>
+                                {{ $pr->user->firstname ?? '' }}
+                                {{ $pr->user->lastname ?? '' }}
+                            </td>
+                            <td>{{ optional($pr->created_at)->format('M d, Y') ?? '—' }}</td>
+                            <td>₱ {{ number_format($pr->amount ?? $pr->total_amount ?? $pr->estimated_cost ?? 0, 2) }}</td>
+                            <td>
+                                <span class="status-badge status-{{ $pr->status }}">
+                                    {{ ucwords(str_replace('_', ' ', $pr->status)) }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ route('procurement.requests.show', $pr->id) }}" class="action-link">View</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-text">No purchase requests in BAC Processing.</div>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-
 </div>
 
 </body>

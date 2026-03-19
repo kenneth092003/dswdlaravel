@@ -10,30 +10,16 @@ class PurchaseRequest extends Model
     use HasFactory;
 
     protected $fillable = [
+        'pr_number',
         'user_id',
-        'doc_number',
-        'activity_title',
-        'division_office',
-        'fund_source',
-        'activity_date',
-        'expected_venue',
-        'priority_level',
-        'purpose_justification',
-        'expected_output',
-        'estimated_total',
+        'office_department',
+        'purpose',
+        'request_date',
+        'needed_date',
         'status',
-        'current_step',
-        'date_filed',
+        'total_amount',
+        'remarks',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'activity_date' => 'date',
-            'date_filed' => 'date',
-            'estimated_total' => 'decimal:2',
-        ];
-    }
 
     public function user()
     {
