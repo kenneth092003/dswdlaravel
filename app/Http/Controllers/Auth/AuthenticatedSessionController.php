@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($user->role === 'Enduser') {
+        if ($user->role === 'End User') {
             return redirect()->route('enduser.dashboard');
         }
 

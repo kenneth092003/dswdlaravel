@@ -18,11 +18,11 @@
                 </div>
                 <div class="step">
                     <div class="step-circle">2</div>
-                    <span>Items</span>
+                    <span>Items & Initial Attachments</span>
                 </div>
                 <div class="step">
                     <div class="step-circle">3</div>
-                    <span>Attachments</span>
+                    <span>Final Attachments</span>
                 </div>
             </div>
 
@@ -80,13 +80,13 @@
                 </div>
 
                 <div class="wizard-footer">
-                    <div class="footer-note">Step 1 of 3 — Activity Proposal</div>
-                    <div class="actions">
-                        <a href="{{ route('enduser.requests.index') }}" class="btn-outline">Cancel</a>
-                        <button type="submit" class="btn-red">Draft Proposal</button>
-                        <button type="submit" class="btn-green">Submit Proposal</button>
-                    </div>
-                </div>
+    <div class="footer-note">Step 1 of 3 — Activity Proposal</div>
+    <div class="actions">
+        <a href="{{ route('enduser.requests.index') }}" class="btn-outline">Cancel</a>
+        <button type="submit" name="submit_action" value="draft" class="btn-red">Draft Proposal</button>
+        <button type="submit" name="submit_action" value="pending" class="btn-green">Submit Proposal</button>
+    </div>
+</div>
             </form>
         </div>
     </div>

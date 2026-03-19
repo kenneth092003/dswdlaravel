@@ -31,22 +31,16 @@
         </div>
 
         <div class="panel-body">
-            <div class="tabs">
-                <span>All</span>
-                <span>Draft</span>
-                <span>Pending</span>
-                <span>Approved</span>
-                <span>Returned</span>
-            </div>
-
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:120px;">Doc No.</th>
+                            <th style="width:130px;">Doc No.</th>
                             <th>Activity / Title</th>
-                            <th style="width:110px;">Date Filed</th>
-                            <th style="width:140px;">Status</th>
+                            <th style="width:130px;">Date Filed</th>
+                            <th style="width:180px;">Division / Office</th>
+                            <th style="width:140px;">Priority Level</th>
+                            <th style="width:130px;">Status</th>
                             <th style="width:100px;">Action</th>
                         </tr>
                     </thead>
@@ -54,30 +48,53 @@
                         @forelse($requests as $request)
                             @php
                                 $badgeClass = 'badge-draft';
-                                if ($request->status === 'pending' || $request->status === 'submitted_to_rd') $badgeClass = 'badge-pending';
-                                elseif (in_array($request->status, ['approved'])) $badgeClass = 'badge-approved';
-                                elseif (in_array($request->status, ['returned', 'rejected'])) $badgeClass = 'badge-returned';
-                                elseif (in_array($request->status, ['processing', 'bac_processing', 'signed_pr', 'validated_payment'])) $badgeClass = 'badge-processing';
+
+                                if ($request->status === 'pending' || $request->status === 'submitted_to_rd' || $request->status === 'submitted_to_procurement') {
+                                    $badgeClass = 'badge-pending';
+                                } elseif (in_array($request->status, ['approved', 'final_approved'])) {
+                                    $badgeClass = 'badge-approved';
+                                } elseif (in_array($request->status, ['returned', 'rejected'])) {
+                                    $badgeClass = 'badge-returned';
+                                } elseif (in_array($request->status, ['processing', 'bac_processing', 'signed_pr', 'validated_payment'])) {
+                                    $badgeClass = 'badge-processing';
+                                }
                             @endphp
+
                             <tr>
-                                <td class="doc-no">{{ $request->doc_number }}</td>
+                                <td class="doc-no">{{ $request->pr_number ?? '-' }}</td>
+
                                 <td>
-                                    <div>{{ $request->activity_title }}</div>
-                                    <div class="muted">₱{{ number_format((float) $request->estimated_total, 2) }} · {{ $request->division_office }}</div>
+                                    <div>{{ $request->purpose ?? '-' }}</div>
+                                    <div class="muted">
+                                        ₱{{ number_format((float) ($request->total_amount ?? 0), 2) }}
+                                    </div>
                                 </td>
+
                                 <td class="muted">
-                                    {{ optional($request->date_filed)->format('M d') }}
+                                    {{ $request->request_date ? \Carbon\Carbon::parse($request->request_date)->format('M d, Y') : '-' }}
                                 </td>
+
+                                <td class="muted">
+                                    {{ $request->office_department ?? '-' }}
+                                </td>
+
+                                <td class="muted">
+                                    {{ $request->priority_level ?? 'Normal' }}
+                                </td>
+
                                 <td>
-                                    <span class="badge {{ $badgeClass }}">{{ str_replace('_', ' ', $request->status) }}</span>
+                                    <span class="badge {{ $badgeClass }}">
+                                        {{ ucwords(str_replace('_', ' ', $request->status)) }}
+                                    </span>
                                 </td>
+
                                 <td>
                                     <a href="{{ route('enduser.requests.show', $request->id) }}" class="view-btn">View</a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="empty-card">No proposals yet.</td>
+                                <td colspan="7" class="empty-card">No purchase requests found.</td>
                             </tr>
                         @endforelse
                     </tbody>
