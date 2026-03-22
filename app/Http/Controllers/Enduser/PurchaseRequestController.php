@@ -30,13 +30,14 @@ class PurchaseRequestController extends Controller
     }
 
     public function show($id)
-    {
-        $purchaseRequest = PurchaseRequest::where('user_id', Auth::id())
-            ->with(['items', 'attachments', 'histories'])
-            ->findOrFail($id);
+{
+    $purchaseRequest = PurchaseRequest::with(['items', 'attachments', 'histories'])
+        ->where('user_id', auth()->id())
+        ->findOrFail($id);
 
-        return view('enduser.requests.show', compact('purchaseRequest'));
-    }
+    return view('enduser.requests.show', compact('purchaseRequest'));
+}
+
 
     public function edit($id)
     {
@@ -48,47 +49,56 @@ class PurchaseRequestController extends Controller
     }
 
     public function storeBasicInfo(Request $request)
-    {
-        $validated = $request->validate([
-            'activity_title' => 'required|string|max:255',
-            'division_office' => 'required|string|max:255',
-            'fund_source' => 'required|string|max:255',
-            'activity_date' => 'required|date',
-            'expected_venue' => 'required|string|max:255',
-            'priority_level' => 'required|string|max:255',
-            'purpose_justification' => 'required|string',
-            'expected_output' => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'activity_title' => 'required|string|max:255',
+        'division_office' => 'required|string|max:255',
+        'fund_source' => 'required|string|max:255',
+        'activity_date' => 'required|date',
+        'expected_venue' => 'required|string|max:255',
+        'priority_level' => 'required|string|max:255',
+        'purpose_justification' => 'required|string',
+        'expected_output' => 'nullable|string',
+    ]);
 
-        $purchaseRequest = PurchaseRequest::create([
-            'user_id' => Auth::id(),
-            'doc_number' => $this->generateDocNumber(),
-            'activity_title' => $validated['activity_title'],
-            'division_office' => $validated['division_office'],
-            'fund_source' => $validated['fund_source'],
-            'activity_date' => $validated['activity_date'],
-            'expected_venue' => $validated['expected_venue'],
-            'priority_level' => $validated['priority_level'],
-            'purpose_justification' => $validated['purpose_justification'],
-            'expected_output' => $validated['expected_output'] ?? null,
-            'estimated_total' => 0,
-            'status' => 'draft',
-            'current_step' => 1,
-            'date_filed' => now()->toDateString(),
-        ]);
+    $status = $request->input('submit_action') === 'pending' ? 'pending' : 'draft';
 
-        $this->setLifecycle(
-            $purchaseRequest,
-            'activity_proposal',
-            'Activity Proposal',
-            'Wait for your proposal to be approved',
-            1,
-            true
-        );
+    $remarks = "Activity Title: {$validated['activity_title']}\n"
+        . "Fund Source: {$validated['fund_source']}\n"
+        . "Expected Venue: {$validated['expected_venue']}\n"
+        . "Priority Level: {$validated['priority_level']}\n"
+        . "Expected Output: " . ($validated['expected_output'] ?? 'N/A');
 
-        return redirect()->route('enduser.requests.edit', $purchaseRequest->id)
-            ->with('success', 'Basic information saved.');
-    }
+    $purchaseRequest = new PurchaseRequest();
+    $purchaseRequest->user_id = Auth::id();
+    $purchaseRequest->pr_number = $this->generatePrNumber();
+    $purchaseRequest->office_department = $validated['division_office'];
+    $purchaseRequest->purpose = $validated['purpose_justification'];
+    $purchaseRequest->request_date = now()->toDateString();
+    $purchaseRequest->needed_date = $validated['activity_date'];
+    $purchaseRequest->status = $status;
+    $purchaseRequest->total_amount = 0;
+    $purchaseRequest->remarks = $remarks;
+    $purchaseRequest->save();
+
+    $this->setLifecycle(
+        $purchaseRequest,
+        'activity_proposal',
+        'Activity Proposal',
+        $status === 'pending'
+            ? 'Proposal submitted and pending approval'
+            : 'Proposal saved as draft',
+        1,
+        true
+    );
+
+    return redirect()
+        ->route('enduser.requests.index', $purchaseRequest->id)
+        ->with('success', $status === 'pending'
+            ? 'Proposal submitted successfully.'
+            : 'Proposal saved as draft.');
+}
+
 
     public function updateBasicInfo(Request $request, $id)
     {
@@ -105,7 +115,17 @@ class PurchaseRequestController extends Controller
             'expected_output' => 'nullable|string',
         ]);
 
-        $purchaseRequest->update($validated);
+        $remarks = "Activity Title: {$validated['activity_title']}\n"
+            . "Fund Source: {$validated['fund_source']}\n"
+            . "Expected Venue: {$validated['expected_venue']}\n"
+            . "Priority Level: {$validated['priority_level']}\n"
+            . "Expected Output: " . ($validated['expected_output'] ?? 'N/A');
+
+        $purchaseRequest->office_department = $validated['division_office'];
+        $purchaseRequest->purpose = $validated['purpose_justification'];
+        $purchaseRequest->needed_date = $validated['activity_date'];
+        $purchaseRequest->remarks = $remarks;
+        $purchaseRequest->save();
 
         return back()->with('success', 'Basic information updated.');
     }
@@ -131,21 +151,19 @@ class PurchaseRequestController extends Controller
                 $lineTotal = (float) $item['qty'] * (float) $item['estimated_unit_cost'];
                 $grandTotal += $lineTotal;
 
-                PurchaseRequestItem::create([
-                    'purchase_request_id' => $purchaseRequest->id,
-                    'item_description' => $item['item_description'],
-                    'unit' => $item['unit'],
-                    'qty' => $item['qty'],
-                    'estimated_unit_cost' => $item['estimated_unit_cost'],
-                    'total_amount' => $lineTotal,
-                    'sort_order' => $index + 1,
-                ]);
+                $requestItem = new PurchaseRequestItem();
+                $requestItem->purchase_request_id = $purchaseRequest->id;
+                $requestItem->item_description = $item['item_description'];
+                $requestItem->unit = $item['unit'];
+                $requestItem->qty = $item['qty'];
+                $requestItem->estimated_unit_cost = $item['estimated_unit_cost'];
+                $requestItem->total_amount = $lineTotal;
+                $requestItem->sort_order = $index + 1;
+                $requestItem->save();
             }
 
-            $purchaseRequest->update([
-                'estimated_total' => $grandTotal,
-                'current_step' => max($purchaseRequest->current_step, 2),
-            ]);
+            $purchaseRequest->total_amount = $grandTotal;
+            $purchaseRequest->save();
         });
 
         $this->replaceLifecycle(
@@ -161,9 +179,15 @@ class PurchaseRequestController extends Controller
     }
 
     public function updateItems(Request $request, $id)
-    {
-        return $this->storeItems($request, $id);
+{
+    $purchaseRequest = PurchaseRequest::where('user_id', auth()->id())->findOrFail($id);
+
+    if ($purchaseRequest->status !== 'approved') {
+        abort(403, 'You can only update items after approval.');
     }
+
+    // save items here...
+}
 
     public function storeAttachments(Request $request, $id)
     {
@@ -180,93 +204,147 @@ class PurchaseRequestController extends Controller
             $this->storeAttachmentFile($request, $purchaseRequest, 'activity_design');
             $this->storeAttachmentFile($request, $purchaseRequest, 'budget_estimate');
             $this->storeAttachmentFile($request, $purchaseRequest, 'endorsement_letter');
-
-            $purchaseRequest->update([
-                'current_step' => max($purchaseRequest->current_step, 3),
-            ]);
         });
 
         return back()->with('success', 'Attachments saved successfully.');
     }
 
     public function updateAttachments(Request $request, $id)
-    {
-        return $this->storeAttachments($request, $id);
+{
+    $purchaseRequest = $this->ownedRequest($id);
+
+    if ($purchaseRequest->status !== 'approved') {
+        abort(403, 'Attachments can only be uploaded when the request is approved.');
     }
+
+    $request->validate([
+        'activity_design' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+        'endorsement_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+        'remarks' => 'nullable|string',
+    ]);
+
+    if ($request->hasFile('activity_design')) {
+        $file = $request->file('activity_design');
+        $path = $file->store('purchase_requests/attachments', 'public');
+
+        $purchaseRequest->attachments()->create([
+            'file_type' => 'activity_design',
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+        ]);
+    }
+
+    if ($request->hasFile('endorsement_letter')) {
+        $file = $request->file('endorsement_letter');
+        $path = $file->store('purchase_requests/attachments', 'public');
+
+        $purchaseRequest->attachments()->create([
+            'file_type' => 'endorsement_letter',
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+        ]);
+    }
+
+    $purchaseRequest->remarks = $request->remarks;
+    $purchaseRequest->save();
+
+    return back()->with('success', 'Attachments uploaded successfully.');
+}
+
 
     public function saveDraft($id)
     {
         $purchaseRequest = $this->ownedRequest($id);
-
-        $purchaseRequest->update([
-            'status' => 'draft',
-        ]);
+        $purchaseRequest->status = 'draft';
+        $purchaseRequest->save();
 
         return back()->with('success', 'Draft saved.');
     }
 
     public function submitProposal($id)
-    {
-        $purchaseRequest = $this->ownedRequest($id);
+{
+    $purchaseRequest = $this->ownedRequest($id);
+    $purchaseRequest->status = 'submitted_to_procurement';
+    $purchaseRequest->save();
 
-        $purchaseRequest->update([
-            'status' => 'pending',
-            'current_step' => 1,
-        ]);
+    $this->replaceLifecycle(
+        $purchaseRequest,
+        'submitted_to_procurement',
+        'Submitted to Procurement',
+        'Your purchase request has been submitted to Procurement.',
+        1,
+        true
+    );
 
-        $this->replaceLifecycle(
-            $purchaseRequest,
-            'activity_proposal',
-            'Activity Proposal',
-            'Wait for your proposal to be approved',
-            1,
-            true
-        );
+    $this->notifyUser(
+        $purchaseRequest,
+        'Proposal Submitted',
+        'Your purchase request has been submitted to Procurement.'
+    );
 
-        $this->notifyUser(
-            $purchaseRequest,
-            'Proposal Submitted',
-            'Your activity proposal has been submitted for approval.'
-        );
+    return back()->with('success', 'Proposal submitted successfully.');
+}
+   public function submitToProcurement($id)
+{
+    $purchaseRequest = $this->ownedRequest($id);
 
-        return back()->with('success', 'Proposal submitted successfully.');
+    if ($purchaseRequest->status !== 'approved') {
+        return back()->with('error', 'Only approved requests can be submitted to procurement.');
     }
+
+    $purchaseRequest->status = 'submitted_to_procurement';
+    $purchaseRequest->save();
+
+    $this->replaceLifecycle(
+        $purchaseRequest,
+        'submitted_to_procurement',
+        'Submitted to Procurement',
+        'Approved proposal with complete items and documents was submitted to procurement.',
+        3,
+        true
+    );
+
+    $this->notifyUser(
+        $purchaseRequest,
+        'Submitted to Procurement',
+        'Your approved proposal has been submitted to procurement successfully.'
+    );
+
+    return redirect()
+        ->route('enduser.requests.show', $purchaseRequest->id)
+        ->with('success', 'Request submitted to procurement successfully.');
+}
+
 
     public function submitSignedPR($id)
-    {
-        $purchaseRequest = $this->ownedRequest($id);
+{
+    $purchaseRequest = $this->ownedRequest($id);
+    $purchaseRequest->status = 'processing';
+    $purchaseRequest->save();
 
-        $purchaseRequest->update([
-            'status' => 'processing',
-            'current_step' => 2,
-        ]);
+    $this->replaceLifecycle(
+        $purchaseRequest,
+        'signed_pr',
+        'Signed Purchase Request',
+        'PR signed and forwarded to FA II',
+        4,
+        true
+    );
 
-        $this->replaceLifecycle(
-            $purchaseRequest,
-            'signed_pr',
-            'Signed Purchase Request',
-            'PR signed and forwarded to FA II',
-            4,
-            true
-        );
+    $this->notifyUser(
+        $purchaseRequest,
+        'Signed PR Submitted',
+        'Your signed purchase request was submitted successfully.'
+    );
 
-        $this->notifyUser(
-            $purchaseRequest,
-            'Signed PR Submitted',
-            'Your signed purchase request was submitted successfully.'
-        );
-
-        return back()->with('success', 'Signed PR submitted successfully.');
-    }
+    return back()->with('success', 'Signed PR submitted successfully.');
+}
 
     public function submitForRDApproval($id)
     {
         $purchaseRequest = $this->ownedRequest($id);
-
-        $purchaseRequest->update([
-            'status' => 'submitted_to_rd',
-            'current_step' => 3,
-        ]);
+        $purchaseRequest->status = 'submitted_to_rd';
+        $purchaseRequest->save();
 
         $this->replaceLifecycle(
             $purchaseRequest,
@@ -302,12 +380,12 @@ class PurchaseRequestController extends Controller
         return PurchaseRequest::where('user_id', Auth::id())->findOrFail($id);
     }
 
-    private function generateDocNumber(): string
+    private function generatePrNumber(): string
     {
         $year = now()->format('Y');
         $latestId = (PurchaseRequest::max('id') ?? 0) + 1;
 
-        return 'AP-' . $year . '-' . str_pad((string) $latestId, 4, '0', STR_PAD_LEFT);
+        return 'PR-' . $year . '-' . str_pad((string) $latestId, 4, '0', STR_PAD_LEFT);
     }
 
     private function storeAttachmentFile(Request $request, PurchaseRequest $purchaseRequest, string $type): void
@@ -329,13 +407,13 @@ class PurchaseRequestController extends Controller
         $file = $request->file($type);
         $path = $file->store('purchase-request-attachments', 'public');
 
-        PurchaseRequestAttachment::create([
-            'purchase_request_id' => $purchaseRequest->id,
-            'file_type' => $type,
-            'file_name' => $file->getClientOriginalName(),
-            'file_path' => $path,
-            'remarks' => $request->input('remarks'),
-        ]);
+        $attachment = new PurchaseRequestAttachment();
+        $attachment->purchase_request_id = $purchaseRequest->id;
+        $attachment->file_type = $type;
+        $attachment->file_name = $file->getClientOriginalName();
+        $attachment->file_path = $path;
+        $attachment->remarks = $request->input('remarks');
+        $attachment->save();
     }
 
     private function setLifecycle(
@@ -346,16 +424,16 @@ class PurchaseRequestController extends Controller
         int $stepNo,
         bool $isCurrent
     ): void {
-        PurchaseRequestHistory::create([
-            'purchase_request_id' => $purchaseRequest->id,
-            'status_key' => $statusKey,
-            'status_label' => $statusLabel,
-            'remarks' => $remarks,
-            'acted_by' => Auth::id(),
-            'acted_at' => now(),
-            'step_no' => $stepNo,
-            'is_current' => $isCurrent,
-        ]);
+        $history = new PurchaseRequestHistory();
+        $history->purchase_request_id = $purchaseRequest->id;
+        $history->status_key = $statusKey;
+        $history->status_label = $statusLabel;
+        $history->remarks = $remarks;
+        $history->acted_by = Auth::id();
+        $history->acted_at = now();
+        $history->step_no = $stepNo;
+        $history->is_current = $isCurrent;
+        $history->save();
     }
 
     private function replaceLifecycle(
@@ -374,13 +452,12 @@ class PurchaseRequestController extends Controller
             ->first();
 
         if ($existing) {
-            $existing->update([
-                'status_label' => $statusLabel,
-                'remarks' => $remarks,
-                'acted_by' => Auth::id(),
-                'acted_at' => now(),
-                'is_current' => $isCurrent,
-            ]);
+            $existing->status_label = $statusLabel;
+            $existing->remarks = $remarks;
+            $existing->acted_by = Auth::id();
+            $existing->acted_at = now();
+            $existing->is_current = $isCurrent;
+            $existing->save();
             return;
         }
 
@@ -389,12 +466,12 @@ class PurchaseRequestController extends Controller
 
     private function notifyUser(PurchaseRequest $purchaseRequest, string $title, string $message): void
     {
-        UserNotification::create([
-            'user_id' => $purchaseRequest->user_id,
-            'purchase_request_id' => $purchaseRequest->id,
-            'title' => $title,
-            'message' => $message,
-            'is_read' => false,
-        ]);
+        $notification = new UserNotification();
+        $notification->user_id = $purchaseRequest->user_id;
+        $notification->purchase_request_id = $purchaseRequest->id;
+        $notification->title = $title;
+        $notification->message = $message;
+        $notification->is_read = false;
+        $notification->save();
     }
 }
