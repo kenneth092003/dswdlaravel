@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
 
-    {{-- Custom styles --}}
     <style>
         .tab-nav button.active {
             background: #1e3a5f;
@@ -95,12 +94,6 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Page heading --}}
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Super Admin — Dashboard</h1>
-                <p class="text-sm text-gray-500 mt-0.5">Manage role-based access and system permissions</p>
-            </div>
-
             {{-- Tab navigation --}}
             <div class="tab-nav flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm w-full overflow-x-auto">
                 <button class="active flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold transition">
@@ -112,12 +105,12 @@
                     <div class="text-xs font-normal text-gray-400">Users &amp; accounts</div>
                 </a>
                 <a href="{{ route('admin.roles.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
-                    <div class="font-bold">Permission Control</div>
+                    <div class="font-bold">Attendance</div>
                     <div class="text-xs font-normal text-gray-400">Roles &amp; access</div>
                 </a>
                 <a href="{{ route('admin.settings.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
-                    <div class="font-bold">System Oversight</div>
-                    <div class="text-xs font-normal text-gray-400">Settings &amp; health</div>
+                    <div class="font-bold">Report Issue</div>
+                    <div class="text-xs font-normal text-gray-400">Submit system issues</div>
                 </a>
                 <a href="{{ route('admin.reports.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Audit Logs</div>
@@ -149,7 +142,10 @@
                 </div>
                 <div class="stat-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                     <p class="text-xs text-gray-500 font-medium">Audit Events Today</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-1">—</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">
+                        {{ \App\Models\User::whereDate('created_at', today())->count() +
+                           \App\Models\User::whereDate('approved_at', today())->count() }}
+                    </p>
                     <p class="text-xs text-gray-400 mt-1">System activities</p>
                 </div>
             </div>
@@ -193,7 +189,7 @@
                                         <span class="role-label status-all-active">• All Active</span>
                                     </td>
                                     <td class="px-5 py-3">
-                                        <a href="{{ route('admin.users.index') }}">
+                                        <a href="{{ route('admin.users.index', ['role' => $role->name]) }}">
                                             <button class="btn-view-users">View Users</button>
                                         </a>
                                     </td>
@@ -210,31 +206,60 @@
                         <h3 class="font-bold text-gray-800 text-sm">Recent System Activity</h3>
                         <a href="{{ route('admin.reports.index') }}" class="text-xs text-blue-600 hover:underline font-semibold">View All</a>
                     </div>
-                    <div class="px-4 py-3 space-y-3 text-xs text-gray-700">
+
+                    @php
+                        $activities = collect();
+
+                        \App\Models\User::latest()->take(5)->get()->each(function($u) use (&$activities) {
+                            $activities->push([
+                                'event' => 'New user account created — ' . $u->firstname . ' ' . $u->lastname,
+                                'dot'   => 'dot-green',
+                                'time'  => $u->created_at,
+                            ]);
+                        });
+
+                        \App\Models\User::whereNotNull('approved_at')
+                            ->orderByDesc('approved_at')
+                            ->take(5)->get()->each(function($u) use (&$activities) {
+                                $activities->push([
+                                    'event' => 'Account approved — ' . $u->firstname . ' ' . $u->lastname,
+                                    'dot'   => 'dot-blue',
+                                    'time'  => $u->approved_at,
+                                ]);
+                            });
+
+                        \App\Models\User::where('is_approved', false)
+                            ->latest()->take(3)->get()->each(function($u) use (&$activities) {
+                                $activities->push([
+                                    'event' => 'Pending account request — ' . $u->firstname . ' ' . $u->lastname,
+                                    'dot'   => 'dot-yellow',
+                                    'time'  => $u->created_at,
+                                ]);
+                            });
+
+                        $activities = $activities->sortByDesc('time')->take(8)->values();
+                    @endphp
+
+                    <div class="px-4 py-3 space-y-3 text-xs text-gray-700" id="activity-feed">
+                        @forelse($activities as $activity)
+                        @php
+                            $time = $activity['time'];
+                            $timeLabel = $time->isToday()
+                                ? 'Today, ' . $time->format('g:i A')
+                                : ($time->isYesterday()
+                                    ? 'Yesterday, ' . $time->format('g:i A')
+                                    : $time->format('M d, Y g:i A'));
+                        @endphp
                         <div class="flex gap-2">
-                            <span class="activity-dot dot-green mt-1"></span>
-                            <div><span class="font-semibold">New user account created</span><br><span class="text-gray-400">Today, 9:14 AM</span></div>
+                            <span class="activity-dot {{ $activity['dot'] }} mt-1"></span>
+                            <div>
+                                <span class="font-semibold">{{ $activity['event'] }}</span><br>
+                                <span class="text-gray-400">{{ $timeLabel }}</span>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <span class="activity-dot dot-blue mt-1"></span>
-                            <div><span class="font-semibold">Account approved</span><br><span class="text-gray-400">Today, 8:52 AM</span></div>
-                        </div>
-                        <div class="flex gap-2">
-                            <span class="activity-dot dot-red mt-1"></span>
-                            <div><span class="font-semibold">Account suspended</span><br><span class="text-gray-400">Today, 8:10 AM</span></div>
-                        </div>
-                        <div class="flex gap-2">
-                            <span class="activity-dot dot-yellow mt-1"></span>
-                            <div><span class="font-semibold">Failed login attempt</span><br><span class="text-gray-400">Yesterday, 11:45 PM</span></div>
-                        </div>
-                        <div class="flex gap-2">
-                            <span class="activity-dot dot-purple mt-1"></span>
-                            <div><span class="font-semibold">Permission updated — FA II role modified</span><br><span class="text-gray-400">Yesterday, 4:20 PM</span></div>
-                        </div>
-                        <div class="flex gap-2">
-                            <span class="activity-dot dot-gray mt-1"></span>
-                            <div><span class="font-semibold">System backup completed successfully</span><br><span class="text-gray-400">Yesterday, 2:00 AM</span></div>
-                        </div>
+                        @empty
+                        <p class="text-gray-400 text-xs py-2">No activity yet.</p>
+                        @endforelse
                     </div>
                 </div>
 
@@ -288,7 +313,7 @@
                                         <form method="POST" action="{{ route('admin.users.destroy', $u) }}" class="inline"
                                               onsubmit="return confirm('Reject and delete this user?');">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="reject-btn">Rejected</button>
+                                            <button type="submit" class="reject-btn">Reject</button>
                                         </form>
                                         <button class="view-btn">View</button>
                                     </div>
@@ -303,4 +328,22 @@
 
         </div>
     </div>
+
+    {{-- Auto-refresh activity feed every 30 seconds --}}
+    <script>
+        setInterval(() => {
+            fetch(window.location.href)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newFeed = doc.getElementById('activity-feed');
+                    const currentFeed = document.getElementById('activity-feed');
+                    if (newFeed && currentFeed) {
+                        currentFeed.innerHTML = newFeed.innerHTML;
+                    }
+                });
+        }, 30000);
+    </script>
+
 </x-app-layout>

@@ -149,15 +149,21 @@
 <body class="font-sans antialiased">
 <div class="min-h-screen bg-gray-100">
 
+    @php
+        $currentRole = strtolower(auth()->user()->getRoleNames()->first() ?? '');
+        $isSuperAdmin = str_contains($currentRole, 'super');
+    @endphp
+
     {{-- ── DSWD Navigation ── --}}
     <nav class="dswd-nav" id="dswd-nav">
         <div class="dswd-accent"></div>
         <div class="dswd-bar">
 
-            {{-- Left: Hamburger + Brand --}}
+            {{-- Left: Hamburger (hidden for Super Admin) + Brand --}}
             <div class="dswd-left-group">
 
-                {{-- Hamburger toggle --}}
+                {{-- Hamburger toggle — hidden for Super Admin --}}
+                @if(!$isSuperAdmin)
                 <button class="dswd-hamburger" id="hamburger-btn" onclick="toggleSidebar()" title="Toggle sidebar">
                     <span class="hb-icon" id="hb-icon">
                         <span class="hb-line"></span>
@@ -165,6 +171,7 @@
                         <span class="hb-line"></span>
                     </span>
                 </button>
+                @endif
 
                 {{-- DSWD Brand --}}
                 <a href="{{ route('dashboard') }}" class="dswd-brand">
@@ -241,10 +248,12 @@
     {{-- ── Sidebar + Content ── --}}
     <div class="flex">
 
-        {{-- Sidebar wrapper (toggleable) --}}
+        {{-- Sidebar — hidden entirely for Super Admin --}}
+        @if(!$isSuperAdmin)
         <div id="app-sidebar">
             @include('layouts.sidebar')
         </div>
+        @endif
 
         <div class="flex-1 min-w-0">
 
@@ -271,12 +280,13 @@
 </div>
 
 <script>
-    // ── Sidebar toggle ──────────────────────────────────
+    // ── Sidebar toggle (only runs for non-Super Admin) ──
     const SIDEBAR_KEY = 'dswd_sidebar_open';
 
     function toggleSidebar() {
         const sidebar = document.getElementById('app-sidebar');
         const icon    = document.getElementById('hb-icon');
+        if (!sidebar) return;
         const isOpen  = !sidebar.classList.contains('sidebar-collapsed');
 
         if (isOpen) {
@@ -290,16 +300,16 @@
         }
     }
 
-    // Restore sidebar state on page load
+    // Restore sidebar state on page load (only for non-Super Admin)
     document.addEventListener('DOMContentLoaded', function () {
         const saved   = localStorage.getItem(SIDEBAR_KEY);
         const sidebar = document.getElementById('app-sidebar');
         const icon    = document.getElementById('hb-icon');
+        if (!sidebar) return;
 
-        // Default: open (null = first visit)
         if (saved === '0') {
             sidebar.classList.add('sidebar-collapsed');
-            icon.classList.add('sidebar-hidden');
+            if (icon) icon.classList.add('sidebar-hidden');
         }
     });
 

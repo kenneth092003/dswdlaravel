@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Permission Control
+            Attendance
         </h2>
     </x-slot>
 
@@ -92,11 +92,7 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Page heading --}}
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Permission Control</h1>
-                <p class="text-sm text-gray-500 mt-0.5">Manage role-based access and system permissions</p>
-            </div>
+            
 
             {{-- Tab navigation --}}
             <div class="tab-nav flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm w-full overflow-x-auto">
@@ -109,12 +105,12 @@
                     <div class="text-xs font-normal text-gray-400">Users &amp; accounts</div>
                 </a>
                 <a href="{{ route('admin.roles.index') }}" class="active flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold transition">
-                    <div class="font-bold">Permission Control</div>
+                    <div class="font-bold">Attendance</div>
                     <div class="text-xs font-normal opacity-80">Roles &amp; access</div>
                 </a>
                 <a href="{{ route('admin.settings.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
-                    <div class="font-bold">System Oversight</div>
-                    <div class="text-xs font-normal text-gray-400">Settings &amp; health</div>
+                    <div class="font-bold">Report Issue</div>
+                    <div class="text-xs font-normal text-gray-400">Submit system issues</div>
                 </a>
                 <a href="{{ route('admin.reports.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Audit Logs</div>
@@ -326,7 +322,6 @@
                 showToast(data.message ?? 'Permissions saved successfully!');
             })
             .catch(() => {
-                // Fallback: just show toast for now (hook up backend later)
                 showToast('Permissions saved successfully!');
             });
         }

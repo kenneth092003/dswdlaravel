@@ -12,6 +12,9 @@ class UserController extends Controller
     {
         $users = User::query()
             ->with('roles')
+            ->when(request('role'), function ($query, $role) {
+                $query->whereHas('roles', fn($q) => $q->where('name', $role));
+            })
             ->orderBy('employee_id')
             ->paginate(10);
 

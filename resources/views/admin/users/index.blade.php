@@ -58,46 +58,44 @@
             font-size:0.85rem; outline:none; width:220px;
         }
         .search-input:focus { border-color:#3b82f6; box-shadow:0 0 0 2px #bfdbfe; }
+
+        .filter-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #ede9fe; color: #5b21b6;
+            font-size: 0.72rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 999px;
+        }
+        .filter-badge a { color: #7c3aed; text-decoration: none; font-size: 0.85rem; font-weight: 900; }
+        .filter-badge a:hover { color: #dc2626; }
     </style>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Page heading --}}
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Account Management</h1>
-                <p class="text-sm text-gray-500 mt-0.5">View, approve, and manage all registered users</p>
-            </div>
+            
 
             {{-- Tab navigation --}}
             <div class="tab-nav flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm w-full overflow-x-auto">
-
-                {{-- ✅ Fixed: no duplicate </a>, using route() --}}
                 <a href="{{ route('dashboard') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Overview</div>
                     <div class="text-xs font-normal text-gray-400">System snapshot</div>
                 </a>
-
                 <a href="{{ route('admin.users.index') }}" class="active flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold transition">
                     <div class="font-bold">Account Management</div>
                     <div class="text-xs font-normal opacity-80">Users &amp; accounts</div>
                 </a>
-
                 <a href="{{ route('admin.roles.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
-                    <div class="font-bold">Permission Control</div>
+                    <div class="font-bold">Attendance</div>
                     <div class="text-xs font-normal text-gray-400">Roles &amp; access</div>
                 </a>
-
                 <a href="{{ route('admin.settings.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
-                    <div class="font-bold">System Oversight</div>
-                    <div class="text-xs font-normal text-gray-400">Settings &amp; health</div>
+                    <div class="font-bold">Report Issue</div>
+                    <div class="text-xs font-normal text-gray-400">Submit system issues</div>
                 </a>
-
                 <a href="{{ route('admin.reports.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Audit Logs</div>
                     <div class="text-xs font-normal text-gray-400">Activity trail</div>
                 </a>
-
             </div>
 
             {{-- Table card --}}
@@ -105,15 +103,26 @@
 
                 {{-- Toolbar --}}
                 <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-semibold text-gray-700">All Users</span>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm font-semibold text-gray-700">
+                            {{ request('role') ? request('role') . ' Users' : 'All Users' }}
+                        </span>
                         <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
                             {{ $users->total() }}
                         </span>
+
+                        {{-- Active role filter badge with clear button --}}
+                        @if(request('role'))
+                            <span class="filter-badge">
+                                Filtered: {{ request('role') }}
+                                <a href="{{ route('admin.users.index') }}" title="Clear filter">✕</a>
+                            </span>
+                        @endif
                     </div>
                     <div class="flex items-center gap-3">
                         <input type="text" placeholder="Search users…" class="search-input" />
-                        <a href="{{ route('admin.users.index') }}" class="text-xs text-blue-600 hover:underline font-semibold">Refresh</a>
+                        <a href="{{ route('admin.users.index', request('role') ? ['role' => request('role')] : []) }}"
+                           class="text-xs text-blue-600 hover:underline font-semibold">Refresh</a>
                     </div>
                 </div>
 
@@ -187,13 +196,21 @@
                                 </td>
                             </tr>
                             @endforeach
+
+                            @if($users->isEmpty())
+                            <tr>
+                                <td colspan="6" class="px-5 py-10 text-center text-gray-400 text-sm">
+                                    No users found{{ request('role') ? ' for role: ' . request('role') : '' }}.
+                                </td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
 
-                {{-- Pagination --}}
+                {{-- Pagination (preserve role filter across pages) --}}
                 <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                    {{ $users->links() }}
+                    {{ $users->appends(request()->query())->links() }}
                 </div>
 
             </div>
