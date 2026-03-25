@@ -18,7 +18,7 @@
     --surface:           #ffffff;
     --text:              #263238;
     --muted:             #6c7785;
-    --sidebar-bg:        #1e2d4a;
+    --sidebar-bg:        #ffffff; /* white with 80% opacity */
     --topbar-h:          64px;
     --sidebar-w:         235px;
     --radius:            8px;
@@ -177,7 +177,7 @@ html,body{
 .notif-dropdown-header{
     padding:12px 14px;
     font-size:13px; font-weight:700; color:#1f2937;
-    background:#f4f7fc;
+    background:#ffffff;
     border-bottom:1px solid #e5eaf1;
     display:flex; align-items:center; justify-content:space-between;
 }
@@ -188,7 +188,7 @@ html,body{
 .notif-body{ max-height:280px; overflow-y:auto; }
 .notif-item{ padding:10px 13px; border-bottom:1px solid #eef2f6; font-size:12px; }
 .notif-item:last-child{ border-bottom:none; }
-.notif-item:hover{ background:#f8fbff; }
+.notif-item:hover{ background:#eef4ff; }
 .notif-item strong{ display:block; font-weight:700; color:#1f2937; line-height:1.4; }
 .notif-item span{ display:block; color:#6b7280; font-size:11px; margin-top:3px; line-height:1.45; }
 .notif-item time{ display:block; font-size:10px; color:#94a3b8; margin-top:4px; }
@@ -243,6 +243,7 @@ html,body{
     background:var(--sidebar-bg);
     display:flex;
     flex-direction:column;
+    border-right:1px solid #e5eaf1;
     height:100%;
     overflow-y:auto;
     overflow-x:hidden;
@@ -256,7 +257,7 @@ html,body{
     text-transform:uppercase;
     letter-spacing:1.2px;
     font-weight:700;
-    color:rgba(255,255,255,.3);
+    color:#9aa3ad;
     padding:14px 16px 5px;
 }
 .menu-link{
@@ -264,7 +265,7 @@ html,body{
     align-items:center;
     gap:9px;
     padding:9px 16px;
-    color:rgba(255,255,255,.6);
+    color:#374151;
     text-decoration:none;
     font-size:13px;
     border-left:3px solid transparent;
@@ -276,12 +277,11 @@ html,body{
     stroke:currentColor; fill:none; stroke-width:2;
     flex-shrink:0; opacity:.8;
 }
-.menu-link:hover{ background:rgba(255,255,255,.07); color:rgba(255,255,255,.95); }
+.menu-link:hover{ background:#f3f6fb; color:#0d4fb3; }
 .menu-link.active{
-    background:rgba(13,79,179,.25);
-    color:#7eb8ff;
-    border-left-color:#3d87e0;
-    font-weight:700;
+     background:#eef4ff;
+     color:#0d4fb3;
+     border-left-color:#0d4fb3;
 }
 .menu-link.active svg{ opacity:1; }
 
