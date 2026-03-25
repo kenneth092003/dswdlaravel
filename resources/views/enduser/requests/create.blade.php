@@ -1,3 +1,4 @@
+{{-- resources/views/enduser/requests/create.blade.php --}}
 @extends('layouts.enduser-internal', ['title' => 'End User - New Proposal / Basic Info'])
 
 @section('content')
@@ -8,7 +9,7 @@
                     <div class="wizard-title">New Activity Proposal</div>
                     <div class="wizard-sub">Complete all steps before submitting for RD approval</div>
                 </div>
-                <div class="close-x">×</div>
+                <a href="{{ route('enduser.requests.index') }}" class="close-x" style="text-decoration:none;color:#fff;">×</a>
             </div>
 
             <div class="steps">
@@ -18,7 +19,7 @@
                 </div>
                 <div class="step">
                     <div class="step-circle">2</div>
-                    <span>Items & Initial Attachments</span>
+                    <span>Items &amp; Initial Attachments</span>
                 </div>
                 <div class="step">
                     <div class="step-circle">3</div>
@@ -80,13 +81,13 @@
                 </div>
 
                 <div class="wizard-footer">
-    <div class="footer-note">Step 1 of 3 — Activity Proposal</div>
-    <div class="actions">
-        <a href="{{ route('enduser.requests.index') }}" class="btn-outline">Cancel</a>
-        <button type="submit" name="submit_action" value="draft" class="btn-red">Draft Proposal</button>
-        <button type="submit" name="submit_action" value="pending" class="btn-green">Submit Proposal</button>
-    </div>
-</div>
+                    <div class="footer-note">Step 1 of 3 — Activity Proposal</div>
+                    <div class="actions">
+                        <a href="{{ route('enduser.requests.index') }}" class="btn-outline">Cancel</a>
+                        <button type="submit" name="submit_action" value="draft" class="btn-red">Draft Proposal</button>
+                        <button type="submit" name="submit_action" value="pending" class="btn-green">Submit Proposal</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
