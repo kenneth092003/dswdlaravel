@@ -72,8 +72,6 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            
-
             {{-- Tab navigation --}}
             <div class="tab-nav flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm w-full overflow-x-auto">
                 <a href="{{ route('dashboard') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
@@ -84,9 +82,10 @@
                     <div class="font-bold">Account Management</div>
                     <div class="text-xs font-normal opacity-80">Users &amp; accounts</div>
                 </a>
-                <a href="{{ route('admin.roles.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+                {{-- ✅ Fixed: attendance.index na --}}
+                <a href="{{ route('admin.attendance.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Attendance</div>
-                    <div class="text-xs font-normal text-gray-400">Roles &amp; access</div>
+                    <div class="text-xs font-normal text-gray-400">Login &amp; logout logs</div>
                 </a>
                 <a href="{{ route('admin.settings.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Report Issue</div>
@@ -111,7 +110,6 @@
                             {{ $users->total() }}
                         </span>
 
-                        {{-- Active role filter badge with clear button --}}
                         @if(request('role'))
                             <span class="filter-badge">
                                 Filtered: {{ request('role') }}
@@ -208,7 +206,7 @@
                     </table>
                 </div>
 
-                {{-- Pagination (preserve role filter across pages) --}}
+                {{-- Pagination --}}
                 <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
                     {{ $users->appends(request()->query())->links() }}
                 </div>

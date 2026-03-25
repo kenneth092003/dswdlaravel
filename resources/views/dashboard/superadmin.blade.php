@@ -104,9 +104,10 @@
                     <div class="font-bold">Account Management</div>
                     <div class="text-xs font-normal text-gray-400">Users &amp; accounts</div>
                 </a>
-                <a href="{{ route('admin.roles.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+                {{-- ✅ Fixed: attendance.index na --}}
+                <a href="{{ route('admin.attendance.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Attendance</div>
-                    <div class="text-xs font-normal text-gray-400">Roles &amp; access</div>
+                    <div class="text-xs font-normal text-gray-400">Login &amp; logout logs</div>
                 </a>
                 <a href="{{ route('admin.settings.index') }}" class="flex-1 text-center px-4 py-3 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
                     <div class="font-bold">Report Issue</div>
