@@ -10,6 +10,11 @@ class AttendanceController extends Controller
     public function index()
     {
         $attendances = Attendance::with('user')
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MAX(id)')
+                      ->from('attendances')
+                      ->groupBy('user_id');
+            })
             ->latest('login_at')
             ->paginate(20);
 

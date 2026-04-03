@@ -29,7 +29,7 @@ class RegisteredUserController extends Controller
             'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password'    => ['required', 'confirmed', Rules\Password::defaults()],
             // ✅ Fixed: exact Spatie role names (no hyphen, correct spacing)
-            'role'        => ['required', Rule::in(['End User', 'Procurement', 'FA II'])],
+            'role'        => ['required', Rule::in(['End User', 'Procurement', 'FA II', 'Super Admin'])],
         ]);
 
         $user = User::create([
