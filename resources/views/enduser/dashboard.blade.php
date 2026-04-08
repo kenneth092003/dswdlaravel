@@ -44,10 +44,9 @@
         </div>
     </div>
 
-    {{-- Main content grid --}}
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;align-items:start;">
+    {{-- FULL WIDTH CONTENT --}}
+    <div style="display:block;">
 
-        {{-- LEFT: My Activity Proposals --}}
         <div class="panel">
             <div class="panel-header" style="justify-content:space-between;">
                 <span>My Activity Proposals</span>
@@ -146,85 +145,10 @@
                         </tbody>
                     </table>
                 </div>
+
             </div>
         </div>
 
-        {{-- RIGHT: Quick Actions + Status Guide --}}
-        <div style="display:flex;flex-direction:column;gap:14px;">
-
-            {{-- Quick Actions --}}
-            <div class="panel">
-                <div class="panel-header">
-                    <span style="display:flex;align-items:center;gap:8px;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="opacity:.85;">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
-                        Quick Actions
-                    </span>
-                </div>
-                <div class="panel-body" style="display:flex;flex-direction:column;gap:8px;">
-                    <a href="{{ route('enduser.requests.create') }}" style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:#f5f8ff;border:1px solid #d9e7ff;border-radius:7px;text-decoration:none;color:#1f3f7d;font-size:13px;font-weight:700;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f3f7d" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                        </svg>
-                        New Activity Proposal
-                    </a>
-
-                    <a href="{{ route('enduser.requests.index') }}" style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:#f5f8ff;border:1px solid #d9e7ff;border-radius:7px;text-decoration:none;color:#1f3f7d;font-size:13px;font-weight:700;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f3f7d" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                        </svg>
-                        My Proposals
-                    </a>
-
-                    <a href="{{ route('enduser.notifications.index') }}" style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:#f5f8ff;border:1px solid #d9e7ff;border-radius:7px;text-decoration:none;color:#1f3f7d;font-size:13px;font-weight:700;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f3f7d" stroke-width="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                        </svg>
-                        Notifications
-                    </a>
-
-                    <a href="{{ route('enduser.profile.edit') }}" style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:#f5f8ff;border:1px solid #d9e7ff;border-radius:7px;text-decoration:none;color:#1f3f7d;font-size:13px;font-weight:700;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f3f7d" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        My Profile
-                    </a>
-                </div>
-            </div>
-
-            {{-- Status Guide --}}
-            <div class="panel">
-                <div class="panel-header">
-                    <span style="display:flex;align-items:center;gap:8px;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="opacity:.85;">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        Status Guide
-                    </span>
-                </div>
-                <div class="panel-body" style="display:flex;flex-direction:column;gap:8px;">
-                    @foreach([
-                        ['draft', 'Draft', 'Saved but not yet submitted.'],
-                        ['pending', 'Pending', 'Submitted, awaiting review.'],
-                        ['approved', 'Approved', 'Approved and in processing.'],
-                        ['returned', 'Returned', 'Sent back for revisions.'],
-                    ] as [$key, $label, $desc])
-                        <div style="display:flex;align-items:flex-start;gap:9px;">
-                            <span class="badge badge-{{ $key }}" style="margin-top:1px;flex-shrink:0;">{{ $label }}</span>
-                            <span style="font-size:12px;color:#6c7785;line-height:1.5;">{{ $desc }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-        </div>
     </div>
 
 @endsection

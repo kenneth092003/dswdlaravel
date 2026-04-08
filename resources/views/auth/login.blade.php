@@ -16,7 +16,7 @@
 <body class="font-sans antialiased bg-white overflow-hidden">
 <div class="h-screen grid grid-cols-1 lg:grid-cols-2">
 
-    {{-- LEFT PANEL fixed, no scroll --}}
+    {{-- LEFT PANEL --}}
     <div class="relative hidden lg:block h-screen overflow-hidden">
         <div class="absolute inset-0">
             <img src="{{ asset('image/pic1.png') }}" class="h-full w-full object-cover" alt="Background">
@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    {{-- RIGHT PANEL fixed, no scroll --}}
+    {{-- RIGHT PANEL --}}
     <div class="flex items-center justify-center p-6 sm:p-10 bg-white h-screen overflow-hidden">
         <div class="w-full max-w-xl">
 
@@ -80,10 +80,35 @@
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
+                    {{-- PASSWORD WITH RIGHT-SIDE TOGGLE --}}
                     <div>
                         <x-input-label for="password" :value="__('Password')" class="!font-extrabold !text-slate-700 tracking-wide" />
-                        <x-text-input id="password" class="block mt-2 w-full !rounded-xl !py-3"
-                                      type="password" name="password" required autocomplete="current-password" />
+
+                        <div class="relative mt-2">
+                            <x-text-input id="passwordField"
+                                          class="block w-full !rounded-xl !py-3 !pr-12"
+                                          type="password"
+                                          name="password"
+                                          required
+                                          autocomplete="current-password" />
+
+                            <button type="button"
+                                    onclick="togglePassword()"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500 hover:text-slate-700">
+
+                                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg"
+                                     class="h-5 w-5"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                     stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+
+                            </button>
+                        </div>
+
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
@@ -124,7 +149,6 @@
 
                 <div class="mt-4 border rounded-2xl p-4 flex items-center gap-4">
                     <div class="h-12 w-12 rounded-full border flex items-center justify-center">
-                        {{-- phone icon --}}
                         <svg viewBox="0 0 24 24" class="h-7 w-7 text-rose-700" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.57-1.1a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.9z"/>
                         </svg>
@@ -143,5 +167,28 @@
     </div>
 
 </div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById('passwordField');
+    const icon = document.getElementById('eyeIcon');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = `
+            <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C5 20 1 12 1 12a21.77 21.77 0 0 1 5.06-6.94"/>
+            <path d="M9.53 9.53a3 3 0 0 0 4.24 4.24"/>
+            <path d="M1 1l22 22"/>
+        `;
+    } else {
+        input.type = 'password';
+        icon.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+            <circle cx="12" cy="12" r="3"/>
+        `;
+    }
+}
+</script>
+
 </body>
 </html>
