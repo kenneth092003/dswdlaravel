@@ -70,6 +70,7 @@ Route::middleware(['auth', 'role:Super Admin'])
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         // ✅ Attendance
