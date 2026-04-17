@@ -51,6 +51,12 @@
 
         <div class="relative max-w-5xl mx-auto px-6 pt-14 pb-24">
 
+            @if(session('status'))
+                <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             {{-- Hero / Header --}}
             <section class="mb-10">
                 <div class="inline-flex items-center gap-2 text-xs font-bold text-red-600 border border-red-200 bg-red-50 rounded-full px-4 py-1.5 uppercase tracking-[0.18em] shadow-sm">
@@ -291,50 +297,79 @@
                     </div>
 
                     <div class="p-8 md:p-10">
-                        <form class="space-y-5">
+                        <form class="space-y-5" method="POST" action="{{ route('support.store') }}">
+                            @csrf
+
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Full Name</label>
-                                    <input type="text" placeholder="Your full name"
+                                    <input type="text" name="full_name" value="{{ old('full_name') }}" placeholder="Your full name"
                                         class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                                    @error('full_name')
+                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Email Address</label>
-                                    <input type="email" placeholder="your.email@dswd.gov.ph"
+                                    <input type="email" name="email" value="{{ old('email') }}" placeholder="your.email@dswd.gov.ph"
                                         class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                                    @error('email')
+                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Role / Position</label>
-                                    <select class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
-                                        <option value="" disabled selected>— Select Role —</option>
-                                        <option>End User</option>
-                                        <option>Procurement</option>
-                                        <option>FA II</option>
-                                        <option>Super Admin</option>
+                                    <select name="role" class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                                        <option value="" disabled {{ old('role') ? '' : 'selected' }}>— Select Role —</option>
+                                        <option value="End User" {{ old('role') === 'End User' ? 'selected' : '' }}>End User</option>
+                                        <option value="Procurement" {{ old('role') === 'Procurement' ? 'selected' : '' }}>Procurement</option>
+                                        <option value="FA II" {{ old('role') === 'FA II' ? 'selected' : '' }}>FA II</option>
+                                        <option value="Super Admin" {{ old('role') === 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
                                     </select>
                                 </div>
 
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Issue Type</label>
-                                    <select class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
-                                        <option value="" disabled selected>— Select Issue Type —</option>
-                                        <option>Login / Access Problem</option>
-                                        <option>Document Submission Error</option>
-                                        <option>Approval Workflow Issue</option>
-                                        <option>Notification Not Received</option>
-                                        <option>Other</option>
+                                    <select name="issue_type" class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                                        <option value="" disabled {{ old('issue_type') ? '' : 'selected' }}>— Select Issue Type —</option>
+                                        <option value="Login / Access Problem" {{ old('issue_type') === 'Login / Access Problem' ? 'selected' : '' }}>Login / Access Problem</option>
+                                        <option value="Document Submission Error" {{ old('issue_type') === 'Document Submission Error' ? 'selected' : '' }}>Document Submission Error</option>
+                                        <option value="Approval Workflow Issue" {{ old('issue_type') === 'Approval Workflow Issue' ? 'selected' : '' }}>Approval Workflow Issue</option>
+                                        <option value="Notification Not Received" {{ old('issue_type') === 'Notification Not Received' ? 'selected' : '' }}>Notification Not Received</option>
+                                        <option value="Other" {{ old('issue_type') === 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
+                                    @error('issue_type')
+                                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
                             <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Subject</label>
+                                <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Short summary of the issue"
+                                    class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                                @error('subject')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
                                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Describe the Issue</label>
-                                <textarea rows="5" placeholder="Please describe what happened, which screen or document is affected, and any error messages you saw..."
-                                    class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition resize-none"></textarea>
+                                <textarea name="description" rows="5" placeholder="Please describe what happened, which screen or document is affected, and any error messages you saw..."
+                                    class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition resize-none">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-2">Affected Page / Module</label>
+                                <input type="text" name="affected_module" value="{{ old('affected_module') }}" placeholder="Example: Dashboard, Login page, Request submission"
+                                    class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
                             </div>
 
                             <div class="pt-2 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">

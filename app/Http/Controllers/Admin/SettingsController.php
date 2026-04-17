@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\SystemIssue;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SettingsController extends Controller
 {
     public function index()
     {
-        // Load recent issues if the system_issues table exists,
-        // otherwise just pass an empty collection.
         $recentIssues = collect();
 
         if (\Schema::hasTable('system_issues')) {
-            $recentIssues = DB::table('system_issues')
-                ->orderByDesc('created_at')
+            $recentIssues = SystemIssue::with('reportedBy')
+                ->latest()
                 ->limit(5)
                 ->get();
         }
@@ -27,29 +25,40 @@ class SettingsController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'full_name'       => 'nullable|string|max:150',
+            'email'           => 'nullable|email|max:150',
+            'role'            => 'nullable|string|max:100',
             'issue_type'      => 'required|string|max:100',
             'priority'        => 'required|string|max:50',
             'subject'         => 'required|string|max:150',
             'description'     => 'required|string|max:2000',
             'affected_module' => 'nullable|string|max:150',
-            'reported_by'     => 'required|integer',
         ]);
 
-        // Save to DB if the table exists, otherwise just flash success
+        $user = auth()->user();
+
         if (\Schema::hasTable('system_issues')) {
-            DB::table('system_issues')->insert([
+            SystemIssue::create([
+                'reported_by'     => auth()->id(),
+                'reporter_name'   => $validated['full_name'] ?? $user?->full_name,
+                'reporter_email'  => $validated['email'] ?? $user?->email,
+                'reporter_role'   => $validated['role'] ?? null,
                 'issue_type'      => $validated['issue_type'],
                 'priority'        => $validated['priority'],
                 'subject'         => $validated['subject'],
                 'description'     => $validated['description'],
                 'affected_module' => $validated['affected_module'] ?? null,
-                'reported_by'     => $validated['reported_by'],
                 'status'          => 'Open',
-                'created_at'      => now(),
-                'updated_at'      => now(),
             ]);
         }
 
         return back()->with('status', 'Issue report submitted successfully. The administrator has been notified.');
+    }
+
+    public function destroy(SystemIssue $issue)
+    {
+        $issue->delete();
+
+        return back()->with('status', 'Support complaint deleted successfully.');
     }
 }

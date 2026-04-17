@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SupportController;
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -40,6 +41,7 @@ Route::get('/', function () {
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/features', 'pages.features')->name('features');
 Route::view('/support', 'pages.support')->name('support');
+Route::post('/support', [SupportController::class, 'store'])->name('support.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +73,7 @@ Route::middleware(['auth', 'role:Super Admin'])
 
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
+        Route::delete('/settings/{issue}', [SettingsController::class, 'destroy'])->name('settings.destroy');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         // ✅ Attendance
