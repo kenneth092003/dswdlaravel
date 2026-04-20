@@ -18,15 +18,14 @@
     --surface:           #ffffff;
     --text:              #263238;
     --muted:             #6c7785;
-    --sidebar-bg:        #ffffff; /* white with 80% opacity */
+    --sidebar-bg:        #ffffff;
     --topbar-h:          64px;
-    --sidebar-w:         235px;
+    --sidebar-w:         180px;
     --radius:            8px;
     --success:           #8cd57e;
     --warning:           #f1c84b;
     --danger:            #e57f7f;
 
-    /* badge tokens */
     --badge-draft-bg:         #e7dcff; --badge-draft-tx:         #7a54c7;
     --badge-pending-bg:       #ffe28f; --badge-pending-tx:       #8a5b00;
     --badge-approved-bg:      #ccefc5; --badge-approved-tx:      #2a7a2f;
@@ -122,15 +121,10 @@ html,body{
 .brand-text small{ display:block; color:var(--muted); font-size:10px; }
 .brand-text strong{ display:block; font-size:15px; color:#1a2332; margin-top:1px; }
 
-/* Vertical divider */
-.topbar-divider{ width:1px; height:40px; background:var(--border); flex-shrink:0; margin:0 2px; }
-
-/* System block */
 .sys-block{ display:flex; flex-direction:column; justify-content:center; }
 .sys-block .sys-label{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
 .sys-block .sys-name{ font-size:15px; font-weight:800; color:var(--blue-dark); line-height:1.2; }
 
-/* Role pill — in topbar, replaces old sidebar END USER badge */
 .role-pill{
     display:inline-flex; align-items:center; gap:6px;
     background:var(--blue-soft);
@@ -215,19 +209,6 @@ html,body{
 .user-name{ font-weight:700; font-size:13px; color:var(--text); }
 .user-email{ font-size:11px; color:#7b8794; }
 
-/* Logout */
-.logout-form{ display:inline; }
-.logout-btn-top{
-    background:#c53030; color:#fff;
-    border:none; border-radius:var(--radius);
-    padding:9px 14px;
-    font-size:12px; font-weight:700;
-    cursor:pointer; letter-spacing:.3px;
-    display:flex; align-items:center; gap:6px;
-}
-.logout-btn-top:hover{ background:#a92828; }
-.logout-btn-top svg{ width:14px; height:14px; stroke:#fff; fill:none; stroke-width:2; }
-
 /* ─── CONTENT SHELL ──────────────────────────── */
 .content-shell{
     display:flex;
@@ -243,7 +224,7 @@ html,body{
     background:var(--sidebar-bg);
     display:flex;
     flex-direction:column;
-    border-right:1px solid #e5eaf1;
+    border-right:1px solid #d9dee7;
     height:100%;
     overflow-y:auto;
     overflow-x:hidden;
@@ -255,17 +236,17 @@ html,body{
 .menu-label{
     font-size:10px;
     text-transform:uppercase;
-    letter-spacing:1.2px;
+    letter-spacing:1px;
     font-weight:700;
-    color:#9aa3ad;
-    padding:14px 16px 5px;
+    color:#a0a7b4;
+    padding:12px 12px 6px;
 }
 .menu-link{
     display:flex;
     align-items:center;
-    gap:9px;
-    padding:9px 16px;
-    color:#374151;
+    gap:8px;
+    padding:8px 12px;
+    color:#4b5563;
     text-decoration:none;
     font-size:13px;
     border-left:3px solid transparent;
@@ -273,15 +254,16 @@ html,body{
     white-space:nowrap;
 }
 .menu-link svg{
-    width:15px; height:15px;
+    width:14px; height:14px;
     stroke:currentColor; fill:none; stroke-width:2;
     flex-shrink:0; opacity:.8;
 }
 .menu-link:hover{ background:#f3f6fb; color:#0d4fb3; }
 .menu-link.active{
-     background:#eef4ff;
-     color:#0d4fb3;
-     border-left-color:#0d4fb3;
+    background:#f0e3a2 !important;
+    color:#111827 !important;
+    border-left-color:#f0e3a2 !important;
+    font-weight:700;
 }
 .menu-link.active svg{ opacity:1; }
 
@@ -295,8 +277,8 @@ html,body{
 .sidebar-footer{
     padding:12px 16px;
     font-size:11px;
-    color:rgba(255,255,255,.2);
-    border-top:1px solid rgba(255,255,255,.06);
+    color:#94a3b8;
+    border-top:1px solid #edf1f5;
 }
 
 /* Collapsed */
@@ -306,7 +288,7 @@ html,body{
 .main{
     flex:1;
     min-width:0;
-    padding:14px 18px 24px;
+    padding:12px 14px 24px;
     overflow-y:auto;
     height:100%;
     transition:all .22s ease;
@@ -328,26 +310,26 @@ html,body{
 .stats{
     display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:14px;
+    gap:12px;
     margin-bottom:10px;
 }
 .stat-card{
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:12px 12px 0 0;
-    border-bottom:4px solid var(--blue-dark);
-    padding:8px 12px 10px;
-    min-height:82px;
+    border-radius:10px;
+    border-top:4px solid var(--blue-dark);
+    padding:10px 12px 8px;
+    min-height:62px;
 }
-.stat-title{ font-size:13px; color:#444; margin-bottom:4px; }
-.stat-value{ font-size:40px; line-height:1; margin:2px 0; font-weight:700; }
-.stat-sub{ font-size:12px; color:#555; }
+.stat-title{ font-size:11px; color:#666; margin-bottom:4px; }
+.stat-value{ font-size:16px; line-height:1; margin:2px 0; font-weight:700; }
+.stat-sub{ font-size:10px; color:#7b8794; text-transform:uppercase; }
 
 /* ─── PANEL ──────────────────────────────────── */
 .panel{
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:0 0 14px 14px;
+    border-radius:14px;
     overflow:hidden;
 }
 .panel-header{
@@ -380,7 +362,6 @@ html,body{
     cursor:pointer; display:inline-flex; align-items:center; gap:6px;
 }
 .btn-primary-dark:hover{ background:#17337a; }
-.btn-primary-dark svg{ width:13px; height:13px; stroke:#fff; fill:none; stroke-width:2.5; }
 .btn-outline{
     background:var(--surface); color:#4b5563;
     border:1px solid #bfc7d1; border-radius:var(--radius);
@@ -395,9 +376,9 @@ html,body{
 
 /* ─── TABLE ──────────────────────────────────── */
 .table-wrap{ width:100%; overflow:auto; }
-table{ width:100%; border-collapse:collapse; font-size:13px; }
+table{ width:100%; border-collapse:collapse; font-size:12px; }
 th,td{ padding:10px 10px; border-bottom:1px solid #eceff3; vertical-align:middle; }
-th{ color:var(--blue-dark); text-align:left; font-size:12px; font-weight:700; background:#f7f9fc; }
+th{ color:#5f6b7a; text-align:left; font-size:11px; font-weight:700; background:#f7f9fc; text-transform:uppercase; }
 th:first-child,td:first-child{ padding-left:14px; }
 tbody tr:hover{ background:#fafbfd; }
 
@@ -414,7 +395,6 @@ tbody tr:hover{ background:#fafbfd; }
 .badge-signed_pr,
 .badge-validated_payment{ background:var(--badge-processing-bg); color:var(--badge-processing-tx); }
 
-/* View button */
 .view-btn{
     border:1px solid #6c8bb3; border-radius:999px;
     padding:4px 16px; color:#2b4770;
@@ -439,21 +419,12 @@ tbody tr:hover{ background:#fafbfd; }
 .field textarea:focus{ border-color:var(--blue); box-shadow:0 0 0 3px rgba(13,79,179,.1); }
 .field input[readonly]{ background:#f1f2f4; color:var(--muted); cursor:not-allowed; }
 .field textarea{ resize:vertical; min-height:90px; }
-.field-hint{ font-size:11px; color:#9aa3ad; margin-top:4px; display:flex; align-items:center; gap:4px; }
-.field-hint svg{ width:11px; height:11px; stroke:#9aa3ad; fill:none; stroke-width:2; }
 
-/* ─── GRID HELPERS ───────────────────────────── */
 .grid-2{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
 
-/* Section label */
-.section-label{
-    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
-    color:var(--blue); border-bottom:2px solid var(--blue-soft-border);
-    padding-bottom:5px; margin-bottom:14px;
-}
+.section-title{ color:#214b86; font-size:13px; font-weight:700; text-transform:uppercase; border-bottom:1px solid #c8d1dc; padding-bottom:6px; margin:16px 0 12px; }
 
-/* ─── WIZARD ─────────────────────────────────── */
 .wizard-overlay{ background:rgba(107,122,138,.45); padding:24px; border-radius:16px; }
 .wizard{ width:min(980px,100%); margin:0 auto; background:var(--surface); border-radius:16px; overflow:hidden; border:1px solid #b9c6d8; box-shadow:0 20px 40px rgba(0,0,0,.18); }
 .wizard-header{ background:var(--blue); color:#fff; padding:18px 20px 16px; display:flex; align-items:flex-start; justify-content:space-between; }
@@ -468,12 +439,10 @@ tbody tr:hover{ background:#fafbfd; }
 .step.done  .step-circle{ background:#a8e58f; border-color:#67b755; color:#1f5c1e; }
 .wizard-body{ padding:22px 28px 18px; background:#f5f3ef; }
 .hint-box{ background:#d6e2f6; border-radius:var(--radius); padding:14px 16px; margin-bottom:18px; font-size:13px; color:#374151; }
-.section-title{ color:#214b86; font-size:13px; font-weight:700; text-transform:uppercase; border-bottom:1px solid #c8d1dc; padding-bottom:6px; margin:16px 0 12px; }
 .wizard-footer{ border-top:1px solid #d6dce3; background:#f8f6f2; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .footer-note{ font-size:12px; color:#8b8f96; }
 .actions{ display:flex; gap:8px; flex-wrap:wrap; }
 
-/* ─── LIFECYCLE ──────────────────────────────── */
 .lifecycle-box{ background:var(--surface); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
 .lifecycle-head{ background:#b8cfef; color:#1b2b44; font-size:12px; font-weight:700; padding:7px 12px; }
 .lifecycle-item{ display:flex; gap:12px; align-items:flex-start; padding:8px 12px; border-top:1px solid #e2e6eb; font-size:13px; }
@@ -483,16 +452,11 @@ tbody tr:hover{ background:#fafbfd; }
 .life-title{ font-weight:700; }
 .life-text{ font-size:12px; color:#555; margin-top:2px; }
 
-/* ─── MISC ───────────────────────────────────── */
 .doc-no{ font-weight:700; color:#111827; }
 .muted{ color:#8c97a5; font-size:12px; }
 .notice-row{ min-height:54px; border-bottom:1px solid #dde3ea; display:flex; align-items:center; padding:0 16px; font-size:14px; }
 .empty-card{ min-height:160px; display:flex; align-items:center; justify-content:center; color:#7d8793; font-size:14px; }
-.empty-state{ padding:36px; text-align:center; color:var(--muted); font-size:13px; }
-.empty-state svg{ display:block; margin:0 auto 12px; width:36px; height:36px; stroke:#cfd6df; fill:none; stroke-width:1.5; }
-.tabs{ display:flex; justify-content:space-around; font-size:14px; color:#3d4650; margin:2px 0 10px; }
 
-/* ─── RESPONSIVE ─────────────────────────────── */
 @media(max-width:1024px){
     .stats{ grid-template-columns:repeat(2,1fr); }
     .grid-3,.grid-2{ grid-template-columns:1fr; }
@@ -523,15 +487,12 @@ tbody tr:hover{ background:#fafbfd; }
 
 <div class="app-shell" id="appShell">
 
-    {{-- Top accent line --}}
     <div class="topbar-line"></div>
 
-    {{-- ── TOPBAR ── --}}
     <header class="topbar">
         <div class="topbar-left">
 
-            <button type="button" class="sidebar-toggle" id="sidebarToggle"
-                    title="Toggle sidebar" aria-label="Toggle sidebar">
+            <button type="button" class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar">
                 <svg viewBox="0 0 24 24">
                     <line x1="3" y1="6"  x2="21" y2="6"/>
                     <line x1="3" y1="12" x2="21" y2="12"/>
@@ -555,7 +516,6 @@ tbody tr:hover{ background:#fafbfd; }
                 </div>
             </div>
 
-            {{-- Role pill: moved here from sidebar --}}
             <div class="role-pill">
                 <span class="dot"></span>
                 End User
@@ -565,10 +525,8 @@ tbody tr:hover{ background:#fafbfd; }
 
         <div class="topbar-right">
 
-            {{-- Notification bell --}}
             <div class="notif-wrapper">
-                <button type="button" class="bell-btn" id="notifToggle"
-                        title="Notifications" aria-label="Notifications">
+                <button type="button" class="bell-btn" id="notifToggle" title="Notifications" aria-label="Notifications">
                     <svg viewBox="0 0 24 24">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -604,7 +562,6 @@ tbody tr:hover{ background:#fafbfd; }
                 </div>
             </div>
 
-            {{-- User chip --}}
             @auth
             <div class="user-topbar">
                 <div class="user-avatar">
@@ -615,83 +572,54 @@ tbody tr:hover{ background:#fafbfd; }
                     <div class="user-email">{{ auth()->user()->email }}</div>
                 </div>
             </div>
-
-            <form method="POST" action="{{ route('logout') }}" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-btn-top">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16,17 21,12 16,7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                    Logout
-                </button>
-            </form>
             @endauth
 
         </div>
     </header>
 
-    {{-- ── BODY ── --}}
     <div class="content-shell">
 
-        {{-- ── SIDEBAR — no END USER badge ── --}}
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-accent"></div>
 
-            <div class="menu-label">Main Menu</div>
+            <div style="background:#1f3f7d;color:#fff;padding:12px 16px;font-size:14px;font-weight:800;text-align:center;">
+                END USER
+            </div>
+
+            <div class="menu-label">Overview</div>
             <a href="{{ route('enduser.dashboard') }}"
                class="menu-link {{ request()->routeIs('enduser.dashboard') ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </a>
 
-            <div class="menu-label">Activity Proposals</div>
-            <a href="{{ route('enduser.requests.create') }}"
-               class="menu-link {{ request()->routeIs('enduser.requests.create') ? 'active' : '' }}">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New Activity Proposal
-            </a>
+            <div class="menu-label">My Work</div>
             <a href="{{ route('enduser.requests.index') }}"
                class="menu-link {{ request()->routeIs('enduser.requests.index','enduser.requests.show','enduser.requests.edit') ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                My Proposals
-            </a>
-
-            <div class="menu-label">Documents</div>
-            <a href="{{ route('enduser.requests.index') }}" class="menu-link">
-                <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                Purchase Requests
-            </a>
-            <a href="{{ route('enduser.requests.index') }}" class="menu-link">
-                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                RFQ Submissions
-            </a>
-            <a href="{{ route('enduser.requests.index') }}" class="menu-link">
-                <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                Final Documents
-            </a>
-
-            <div class="menu-label">Account</div>
-            <a href="{{ route('enduser.notifications.index') }}"
-               class="menu-link {{ request()->routeIs('enduser.notifications.*') ? 'active' : '' }}">
-                <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                Notifications
+                My Workplace
                 @if($unreadCount > 0)
                     <span class="nav-badge">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('enduser.profile.edit') }}"
-               class="menu-link {{ request()->routeIs('enduser.profile.*') ? 'active' : '' }}">
-                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Profile
+
+            <div class="menu-label">Records</div>
+            <a href="{{ route('enduser.requests.index') }}" class="menu-link">
+                <svg viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+                Archive History
             </a>
 
             <div class="sidebar-spacer"></div>
-            <div class="sidebar-footer">Purchase Tracking System &copy; {{ date('Y') }}</div>
+
+            <form method="POST" action="{{ route('logout') }}" style="padding:0 16px 16px;">
+                @csrf
+                <button type="submit"
+                    style="width:100%;height:36px;border:none;border-radius:8px;background:#ffffff;color:#1f2937;font-size:12px;font-weight:700;cursor:pointer;">
+                    Logout
+                </button>
+            </form>
         </aside>
 
-        {{-- ── MAIN ── --}}
         <main class="main">
 
             @if(session('success'))
@@ -716,8 +644,8 @@ tbody tr:hover{ background:#fafbfd; }
 
         </main>
 
-    </div>{{-- /content-shell --}}
-</div>{{-- /app-shell --}}
+    </div>
+</div>
 
 <script>
 (function () {
