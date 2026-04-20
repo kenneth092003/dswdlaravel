@@ -83,6 +83,155 @@
         /* Right */
         .dswd-right { display: flex; align-items: center; gap: 14px; position: relative; }
 
+        .dswd-notif-wrap {
+            position: relative;
+        }
+
+        .dswd-notif-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            color: #1a3a6b;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.15s, border-color 0.15s;
+        }
+
+        .dswd-notif-btn:hover {
+            background: #eef4ff;
+            border-color: #c7d2fe;
+            transform: translateY(-1px);
+        }
+
+        .dswd-notif-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .dswd-notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 2px #fff;
+        }
+
+        .dswd-notif-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: min(340px, calc(100vw - 24px));
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+            overflow: hidden;
+            z-index: 120;
+        }
+
+        .dswd-notif-dropdown.open {
+            display: block;
+        }
+
+        .dswd-notif-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            background: #f8fafc;
+        }
+
+        .dswd-notif-title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .dswd-notif-subtitle {
+            margin-top: 2px;
+            font-size: 0.72rem;
+            color: #6b7280;
+        }
+
+        .dswd-notif-list {
+            max-height: 320px;
+            overflow: auto;
+        }
+
+        .dswd-notif-item {
+            display: block;
+            padding: 12px 16px;
+            text-decoration: none;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.12s;
+        }
+
+        .dswd-notif-item:hover {
+            background: #f8fafc;
+        }
+
+        .dswd-notif-item:last-child {
+            border-bottom: none;
+        }
+
+        .dswd-notif-item-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .dswd-notif-item-msg {
+            margin-top: 4px;
+            font-size: 0.75rem;
+            line-height: 1.45;
+            color: #4b5563;
+        }
+
+        .dswd-notif-item-time {
+            margin-top: 6px;
+            font-size: 0.68rem;
+            color: #9ca3af;
+        }
+
+        .dswd-notif-footer {
+            padding: 10px 16px;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dswd-notif-footer a,
+        .dswd-notif-footer button {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #1a3a6b;
+            background: none;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
         .dswd-user-btn {
             display: flex; align-items: center; gap: 9px;
             background: none; border: none; cursor: pointer;
@@ -210,14 +359,83 @@
             </div>
 
             {{-- Right: user dropdown --}}
-            @auth
-            @php
-                $u        = auth()->user();
-                $initials = strtoupper(substr($u->firstname ?? $u->name ?? 'U', 0, 1) . substr($u->lastname ?? '', 0, 1));
-                $fullname = trim(($u->firstname ?? '') . ' ' . ($u->lastname ?? '')) ?: ($u->name ?? 'User');
-                $role     = $u->getRoleNames()->first() ?? 'User';
-            @endphp
+    @auth
+    @php
+        $u        = auth()->user();
+        $initials = strtoupper(substr($u->firstname ?? $u->name ?? 'U', 0, 1) . substr($u->lastname ?? '', 0, 1));
+        $fullname = trim(($u->firstname ?? '') . ' ' . ($u->lastname ?? '')) ?: ($u->name ?? 'User');
+        $role     = $u->getRoleNames()->first() ?? 'User';
+        $adminNotifications = collect();
+        $adminUnreadCount = 0;
+        $markAdminNotificationsReadUrl = route('admin.settings.notifications.readall');
+
+        if ($isSuperAdmin) {
+            $adminNotifications = \App\Models\UserNotification::where('user_id', $u->id)
+                ->where('is_read', false)
+                ->latest()
+                ->limit(5)
+                ->get();
+
+            $adminUnreadCount = \App\Models\UserNotification::where('user_id', $u->id)
+                ->where('is_read', false)
+                ->count();
+        }
+    @endphp
             <div class="dswd-right">
+                @if($isSuperAdmin)
+                <div class="dswd-notif-wrap">
+                    <button type="button"
+                        class="dswd-notif-btn"
+                        id="admin-notif-btn"
+                        data-live-url="{{ route('admin.settings.notifications.live') }}"
+                        data-mark-read-url="{{ $markAdminNotificationsReadUrl }}"
+                        data-open-complaints-url="{{ route('admin.settings.index') }}"
+                        aria-expanded="false"
+                        aria-label="Notifications">
+                        <svg viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4a2 2 0 01-.6-1.4V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0m6 0H9" />
+                        </svg>
+                        <span class="dswd-notif-badge" id="admin-notif-badge" @if($adminUnreadCount === 0) style="display:none" @endif>
+                            {{ $adminUnreadCount > 9 ? '9+' : $adminUnreadCount }}
+                        </span>
+                    </button>
+
+                    <div class="dswd-notif-dropdown" id="admin-notif-drop">
+                        <div class="dswd-notif-header">
+                            <div class="dswd-notif-title">Admin Notifications</div>
+                            <div class="dswd-notif-subtitle" id="admin-notif-subtitle">
+                                {{ $adminUnreadCount }} unread notification{{ $adminUnreadCount === 1 ? '' : 's' }}
+                            </div>
+                        </div>
+
+                        <div class="dswd-notif-list" id="admin-notif-list">
+                            @forelse($adminNotifications as $notif)
+                                <a href="{{ route('admin.settings.index') }}" class="dswd-notif-item">
+                                    <div class="dswd-notif-item-title">{{ $notif->title }}</div>
+                                    <div class="dswd-notif-item-msg">{{ $notif->message }}</div>
+                                    <div class="dswd-notif-item-time">{{ $notif->created_at?->diffForHumans() }}</div>
+                                </a>
+                            @empty
+                                <div class="px-4 py-5 text-sm text-slate-500">
+                                    No unread notifications.
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <div class="dswd-notif-footer" id="admin-notif-footer">
+                            <a href="{{ route('admin.settings.index') }}">Open admin settings</a>
+                            @if($adminUnreadCount > 0)
+                                <form method="POST" action="{{ route('admin.settings.notifications.readall') }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit">Mark all as read</button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <button class="dswd-user-btn" id="user-btn" onclick="toggleDrop()" aria-expanded="false">
                     <div class="dswd-avatar">{{ $initials }}</div>
                     <div style="text-align:left">
@@ -320,12 +538,133 @@
         const open = drop.classList.toggle('open');
         btn.setAttribute('aria-expanded', open);
     }
+
+    function toggleAdminNotif() {
+        const btn = document.getElementById('admin-notif-btn');
+        const drop = document.getElementById('admin-notif-drop');
+        if (!btn || !drop) return;
+
+        const open = drop.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+    }
+
+    function renderAdminNotifications(payload) {
+        const badge = document.getElementById('admin-notif-badge');
+        const subtitle = document.getElementById('admin-notif-subtitle');
+        const list = document.getElementById('admin-notif-list');
+        const footer = document.getElementById('admin-notif-footer');
+        const openUrl = document.getElementById('admin-notif-btn')?.dataset.openComplaintsUrl;
+
+        if (badge) {
+            if (payload.count > 0) {
+                badge.style.display = '';
+                badge.textContent = payload.count > 9 ? '9+' : payload.count;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        if (subtitle) {
+            subtitle.textContent = `${payload.count} unread notification${payload.count === 1 ? '' : 's'}`;
+        }
+
+        if (list) {
+            if (!payload.notifications || payload.notifications.length === 0) {
+                list.innerHTML = '<div class="px-4 py-5 text-sm text-slate-500">No unread notifications.</div>';
+            } else {
+                list.innerHTML = payload.notifications.map((notification) => `
+                    <a href="${openUrl || '#'}" class="dswd-notif-item">
+                        <div class="dswd-notif-item-title">${notification.title ?? 'Notification'}</div>
+                        <div class="dswd-notif-item-msg">${notification.message ?? ''}</div>
+                        <div class="dswd-notif-item-time">${notification.time ?? ''}</div>
+                    </a>
+                `).join('');
+            }
+        }
+
+        if (footer) {
+            footer.innerHTML = `
+                <a href="${openUrl || '#'}">Open admin settings</a>
+                ${payload.count > 0 ? `
+                    <form method="POST" action="${document.getElementById('admin-notif-btn')?.dataset.markReadUrl || '#'}">
+                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''}">
+                        <input type="hidden" name="_method" value="PATCH">
+                        <button type="submit">Mark all as read</button>
+                    </form>
+                ` : ''}
+            `;
+        }
+    }
+
+    async function refreshAdminNotifications() {
+        const btn = document.getElementById('admin-notif-btn');
+        if (!btn || !btn.dataset.liveUrl) return;
+
+        try {
+            const response = await fetch(btn.dataset.liveUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (!response.ok) return;
+
+            const payload = await response.json();
+            renderAdminNotifications(payload);
+        } catch (error) {
+            console.error('Failed to refresh admin notifications:', error);
+        }
+    }
+
+    async function markAdminNotificationsRead() {
+        const btn = document.getElementById('admin-notif-btn');
+        if (!btn) return;
+
+        const url = btn.dataset.markReadUrl;
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!url || !token) return;
+
+        try {
+            await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
+            await refreshAdminNotifications();
+        } catch (error) {
+            console.error('Failed to mark notifications as read:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('admin-notif-btn');
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                toggleAdminNotif();
+                markAdminNotificationsRead();
+            });
+
+            refreshAdminNotifications();
+            setInterval(refreshAdminNotifications, 15000);
+        }
+    });
     document.addEventListener('click', function(e) {
         const btn  = document.getElementById('user-btn');
         const drop = document.getElementById('user-drop');
+        const notifBtn = document.getElementById('admin-notif-btn');
+        const notifDrop = document.getElementById('admin-notif-drop');
         if (btn && drop && !btn.contains(e.target) && !drop.contains(e.target)) {
             drop.classList.remove('open');
             btn.setAttribute('aria-expanded', 'false');
+        }
+        if (notifBtn && notifDrop && !notifBtn.contains(e.target) && !notifDrop.contains(e.target)) {
+            notifDrop.classList.remove('open');
+            notifBtn.setAttribute('aria-expanded', 'false');
         }
     });
 </script>

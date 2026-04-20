@@ -68,12 +68,15 @@ Route::middleware(['auth', 'role:Super Admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.role.update');
         Route::post('/users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
         Route::delete('/settings/{issue}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+        Route::patch('/settings/notifications/read-all', [SettingsController::class, 'markNotificationsRead'])->name('settings.notifications.readall');
+        Route::get('/settings/notifications/live', [SettingsController::class, 'liveNotifications'])->name('settings.notifications.live');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         // ✅ Attendance

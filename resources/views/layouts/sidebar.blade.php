@@ -9,7 +9,7 @@
             Dashboard
         </a>
 
-        @role('Superadmin')
+        @role('Super Admin')
             <a href="{{ route('admin.users.index') }}"
                class="block px-3 py-2 rounded hover:bg-gray-100">
                 All Users

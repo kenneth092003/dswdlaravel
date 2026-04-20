@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SystemIssue;
+use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Http\Request;
 
 class SupportController extends Controller
@@ -20,7 +22,7 @@ class SupportController extends Controller
             'affected_module' => 'nullable|string|max:150',
         ]);
 
-        SystemIssue::create([
+        $issue = SystemIssue::create([
             'reported_by'     => auth()->id(),
             'full_name'       => $validated['full_name'],
             'email'           => $validated['email'],
@@ -36,6 +38,22 @@ class SupportController extends Controller
             'affected_module' => $validated['affected_module'] ?? null,
             'status'          => 'Open',
         ]);
+
+        $admins = User::role('Super Admin')->get();
+
+        foreach ($admins as $admin) {
+            $notification = new UserNotification();
+            $notification->user_id = $admin->id;
+            $notification->system_issue_id = $issue->id;
+            $notification->title = 'New Support Complaint';
+            $notification->message = trim(
+                ($validated['full_name'] ?? 'Anonymous') .
+                ' submitted a complaint: ' .
+                $validated['subject']
+            );
+            $notification->is_read = false;
+            $notification->save();
+        }
 
         return back()->with('status', 'Your support report has been submitted. The Super Admin can now review it.');
     }

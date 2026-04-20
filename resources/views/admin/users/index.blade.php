@@ -67,6 +67,35 @@
         }
         .filter-badge a { color: #7c3aed; text-decoration: none; font-size: 0.85rem; font-weight: 900; }
         .filter-badge a:hover { color: #dc2626; }
+
+        .role-form select {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 30px 2px 10px;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            min-width: 130px;
+        }
+        .role-form select:focus {
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
+        .role-form .role-select-wrap {
+            position: relative;
+            display: inline-block;
+        }
+        .role-form .role-select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.65rem;
+            pointer-events: none;
+            color: inherit;
+        }
     </style>
 
     <div class="py-8">
@@ -165,9 +194,19 @@
                                 </td>
                                 <td class="px-5 py-3 text-gray-500">{{ $u->email }}</td>
                                 <td class="px-5 py-3">
-                                    <span class="role-badge {{ $badgeClass }}">
-                                        {{ $u->getRoleNames()->join(', ') ?: 'No Role' }}
-                                    </span>
+                                    <form method="POST" action="{{ route('admin.users.role.update', $u) }}" class="role-form inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <span class="role-select-wrap role-badge {{ $badgeClass }}">
+                                            <select name="role" onchange="this.form.submit()" class="bg-transparent text-inherit">
+                                                @foreach ($availableRoles as $role)
+                                                    <option value="{{ $role }}" @selected($u->role === $role || $u->getRoleNames()->first() === $role)>
+                                                        {{ $role }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </span>
+                                    </form>
                                 </td>
                                 <td class="px-5 py-3">
                                     @if ($u->is_approved)

@@ -40,7 +40,7 @@
                     @endrole
 
                     {{-- End-user dashboard --}}
-                    @role('Enduser')
+                    @role('End User')
                         <div class="mt-6">
                             <h3 class="text-lg font-bold">End-user Dashboard</h3>
                             <ul class="list-disc pl-6 space-y-2">
@@ -73,7 +73,7 @@
                     @endrole
 
                     {{-- FA II dashboard --}}
-                    @role('FAII')
+                    @role('FA II')
                         <div class="mt-6">
                             <h3 class="text-lg font-bold">FA II Dashboard</h3>
                             <ul class="list-disc pl-6 space-y-2">

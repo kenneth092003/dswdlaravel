@@ -13,7 +13,7 @@ class SuperAdminSeeder extends Seeder
     {
         // Ensure the Super Admin role exists
         Role::firstOrCreate([
-            'name'       => 'Superadmin',
+            'name'       => 'Super Admin',
             'guard_name' => 'web'
         ]);
 
@@ -27,11 +27,11 @@ class SuperAdminSeeder extends Seeder
                 'password'    => Hash::make('password'),
                 'is_approved' => true,
                 'approved_at' => now(),
-                'role'        => 'Superadmin',
+                'role'        => 'Super Admin',
             ]
         );
 
         // Assign role via Spatie
-        $admin->assignRole('Superadmin');
+        $admin->syncRoles(['Super Admin']);
     }
 }
