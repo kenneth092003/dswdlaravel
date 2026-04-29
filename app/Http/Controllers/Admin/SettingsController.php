@@ -14,6 +14,9 @@ class SettingsController extends Controller
     public function index()
     {
         $recentIssues = collect();
+        $pendingApprovalCount = 0;
+        $signupNotificationCount = 0;
+        $complaintNotificationCount = 0;
 
         if (\Schema::hasTable('system_issues')) {
             $recentIssues = SystemIssue::with('reportedBy')
@@ -22,7 +25,22 @@ class SettingsController extends Controller
                 ->get();
         }
 
-        return view('admin.settings.index', compact('recentIssues'));
+        $pendingApprovalCount = \App\Models\User::where('is_approved', false)->count();
+        $signupNotificationCount = UserNotification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->where('title', 'New User Registration')
+            ->count();
+        $complaintNotificationCount = UserNotification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->whereNotNull('system_issue_id')
+            ->count();
+
+        return view('admin.settings.index', compact(
+            'recentIssues',
+            'pendingApprovalCount',
+            'signupNotificationCount',
+            'complaintNotificationCount'
+        ));
     }
 
     public function store(Request $request)
@@ -90,9 +108,13 @@ class SettingsController extends Controller
             ->limit(5)
             ->get()
             ->map(fn ($notification) => [
+                'id' => $notification->id,
                 'title' => $notification->title,
                 'message' => $notification->message,
                 'time' => $notification->created_at?->diffForHumans(),
+                'url' => $notification->title === 'New User Registration'
+                    ? route('admin.users.index')
+                    : route('admin.settings.index'),
             ]);
 
         return response()->json([
@@ -101,5 +123,20 @@ class SettingsController extends Controller
                 ->count(),
             'notifications' => $notifications,
         ]);
+    }
+
+    public function markNotificationRead(UserNotification $notification): JsonResponse
+    {
+        abort_unless($notification->user_id === Auth::id(), 403);
+
+        if (! $notification->is_read) {
+            $notification->update(['is_read' => true]);
+        }
+
+        $count = UserNotification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json(['count' => $count]);
     }
 }

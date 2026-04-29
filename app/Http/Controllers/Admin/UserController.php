@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserNotification;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,9 +23,31 @@ class UserController extends Controller
             })
             ->orderBy('employee_id')
             ->paginate(10);
+        $pendingApprovalCount = User::where('is_approved', false)->count();
+        $signupNotificationCount = UserNotification::where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->where('title', 'New User Registration')
+            ->count();
+        $complaintNotificationCount = UserNotification::where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->whereNotNull('system_issue_id')
+            ->count();
 
         return view('admin.users.index', [
             'users' => $users,
+            'availableRoles' => self::AVAILABLE_ROLES,
+            'pendingApprovalCount' => $pendingApprovalCount,
+            'signupNotificationCount' => $signupNotificationCount,
+            'complaintNotificationCount' => $complaintNotificationCount,
+        ]);
+    }
+
+    public function edit(User $user)
+    {
+        $user->load('roles');
+
+        return view('admin.users.edit', [
+            'user' => $user,
             'availableRoles' => self::AVAILABLE_ROLES,
         ]);
     }
@@ -54,6 +77,22 @@ class UserController extends Controller
         });
 
         return back()->with('status', 'User role updated successfully.');
+    }
+
+    public function toggleApproval(User $user): RedirectResponse
+    {
+        $isApproved = ! $user->is_approved;
+
+        $user->update([
+            'is_approved' => $isApproved,
+            'approved_at' => $isApproved ? now() : null,
+        ]);
+
+        $message = $isApproved
+            ? 'User account activated successfully.'
+            : 'User account suspended successfully.';
+
+        return back()->with('status', $message);
     }
 
     public function destroy(User $user): RedirectResponse

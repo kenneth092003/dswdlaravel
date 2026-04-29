@@ -389,6 +389,7 @@
                         id="admin-notif-btn"
                         data-live-url="{{ route('admin.settings.notifications.live') }}"
                         data-mark-read-url="{{ $markAdminNotificationsReadUrl }}"
+                        data-read-notification-url="{{ route('admin.settings.notifications.read', ['notification' => '__ID__']) }}"
                         data-open-complaints-url="{{ route('admin.settings.index') }}"
                         aria-expanded="false"
                         aria-label="Notifications">
@@ -548,12 +549,22 @@
         btn.setAttribute('aria-expanded', open);
     }
 
+    function closeAdminNotif() {
+        const btn = document.getElementById('admin-notif-btn');
+        const drop = document.getElementById('admin-notif-drop');
+        if (!btn || !drop) return;
+
+        drop.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+
     function renderAdminNotifications(payload) {
         const badge = document.getElementById('admin-notif-badge');
         const subtitle = document.getElementById('admin-notif-subtitle');
         const list = document.getElementById('admin-notif-list');
         const footer = document.getElementById('admin-notif-footer');
         const openUrl = document.getElementById('admin-notif-btn')?.dataset.openComplaintsUrl;
+        const readUrlTemplate = document.getElementById('admin-notif-btn')?.dataset.readNotificationUrl;
 
         if (badge) {
             if (payload.count > 0) {
@@ -573,7 +584,10 @@
                 list.innerHTML = '<div class="px-4 py-5 text-sm text-slate-500">No unread notifications.</div>';
             } else {
                 list.innerHTML = payload.notifications.map((notification) => `
-                    <a href="${openUrl || '#'}" class="dswd-notif-item">
+                    <a href="${notification.url || openUrl || '#'}"
+                       class="dswd-notif-item"
+                       data-notif-id="${notification.id || ''}"
+                       data-notif-url="${notification.url || openUrl || '#'}">
                         <div class="dswd-notif-item-title">${notification.title ?? 'Notification'}</div>
                         <div class="dswd-notif-item-msg">${notification.message ?? ''}</div>
                         <div class="dswd-notif-item-time">${notification.time ?? ''}</div>
@@ -640,17 +654,60 @@
         }
     }
 
+    async function markSingleAdminNotificationRead(notificationId) {
+        const btn = document.getElementById('admin-notif-btn');
+        if (!btn || !notificationId) return;
+
+        const template = btn.dataset.readNotificationUrl;
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!template || !token) return;
+
+        const url = template.replace('__ID__', notificationId);
+
+        try {
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) return;
+
+            await refreshAdminNotifications();
+        } catch (error) {
+            console.error('Failed to mark single notification as read:', error);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const btn = document.getElementById('admin-notif-btn');
         if (btn) {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 toggleAdminNotif();
-                markAdminNotificationsRead();
             });
 
+            const list = document.getElementById('admin-notif-list');
+            if (list) {
+                list.addEventListener('click', async function (e) {
+                    const item = e.target.closest('[data-notif-id]');
+                    if (!item) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const notifId = item.dataset.notifId;
+                    const notifUrl = item.dataset.notifUrl || '#';
+                    closeAdminNotif();
+                    await markSingleAdminNotificationRead(notifId);
+                    window.location.href = notifUrl;
+                });
+            }
+
             refreshAdminNotifications();
-            setInterval(refreshAdminNotifications, 15000);
         }
     });
     document.addEventListener('click', function(e) {

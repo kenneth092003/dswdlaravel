@@ -68,7 +68,9 @@ Route::middleware(['auth', 'role:Super Admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [UserController::class, 'edit'])->name('users.edit');
         Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.role.update');
+        Route::patch('/users/{user}/status', [UserController::class, 'toggleApproval'])->name('users.status.toggle');
         Route::post('/users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
@@ -77,6 +79,7 @@ Route::middleware(['auth', 'role:Super Admin'])
         Route::delete('/settings/{issue}', [SettingsController::class, 'destroy'])->name('settings.destroy');
         Route::patch('/settings/notifications/read-all', [SettingsController::class, 'markNotificationsRead'])->name('settings.notifications.readall');
         Route::get('/settings/notifications/live', [SettingsController::class, 'liveNotifications'])->name('settings.notifications.live');
+        Route::patch('/settings/notifications/{notification}/read', [SettingsController::class, 'markNotificationRead'])->name('settings.notifications.read');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         // ✅ Attendance

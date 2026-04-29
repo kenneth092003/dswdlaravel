@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserNotification;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,21 @@ class DashboardController extends Controller
 
         // ✅ Fixed role names to match DB exactly
         if ($user->hasRole('Super Admin')) {
-            return view('dashboard.superadmin');
+            $pendingApprovalCount = User::where('is_approved', false)->count();
+            $signupNotificationCount = UserNotification::where('user_id', $user->id)
+                ->where('is_read', false)
+                ->where('title', 'New User Registration')
+                ->count();
+            $complaintNotificationCount = UserNotification::where('user_id', $user->id)
+                ->where('is_read', false)
+                ->whereNotNull('system_issue_id')
+                ->count();
+
+            return view('dashboard.superadmin', compact(
+                'pendingApprovalCount',
+                'signupNotificationCount',
+                'complaintNotificationCount'
+            ));
         }
 
         if ($user->hasRole('End User')) {
