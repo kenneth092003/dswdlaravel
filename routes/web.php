@@ -69,6 +69,9 @@ Route::middleware(['auth', 'role:Super Admin'])
     ->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/{user}', [UserController::class, 'edit'])->name('users.edit');
+
+        Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update'); //edit user details
+
         Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.role.update');
         Route::patch('/users/{user}/status', [UserController::class, 'toggleApproval'])->name('users.status.toggle');
         Route::post('/users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');

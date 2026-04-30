@@ -102,4 +102,30 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('status', 'User deleted successfully.');
     }
+
+    public function update(Request $request, User $user): RedirectResponse
+{
+    $validated = $request->validate([
+        'firstname' => ['required', 'string', 'max:255'],
+        'lastname'  => ['required', 'string', 'max:255'],
+        'email'     => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+        'division'  => ['nullable', 'string', 'max:255'],
+        'role'      => ['required', 'string', Rule::in(self::AVAILABLE_ROLES)],
+    ]);
+
+    DB::transaction(function () use ($user, $validated): void {
+        $user->update([
+            'firstname' => $validated['firstname'],
+            'lastname'  => $validated['lastname'],
+            'email'     => $validated['email'],
+            'division'  => $validated['division'] ?? null,
+            'role'      => $validated['role'],
+        ]);
+
+        $user->syncRoles([$validated['role']]);
+    });
+
+    return back()->with('status', 'User information updated successfully.');
+}
+
 }
