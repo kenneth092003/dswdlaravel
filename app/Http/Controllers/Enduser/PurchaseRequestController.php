@@ -7,6 +7,7 @@ use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestAttachment;
 use App\Models\PurchaseRequestHistory;
 use App\Models\PurchaseRequestItem;
+use App\Models\User;
 use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,19 @@ class PurchaseRequestController extends Controller
     return view('enduser.requests.show', compact('purchaseRequest'));
 }
 
+    public function draftPurchaseRequest($id)
+    {
+        $purchaseRequest = $this->ownedRequest($id);
+
+        if ($purchaseRequest->status !== 'approved') {
+            return back()->with('error', 'You can only draft a Purchase Request after the proposal is approved.');
+        }
+
+        return redirect()
+            ->route('enduser.requests.edit', $purchaseRequest->id)
+            ->with('success', 'Proposal approved. You can now draft the Purchase Request.');
+    }
+
 
     public function edit($id)
     {
@@ -49,55 +63,67 @@ class PurchaseRequestController extends Controller
     }
 
     public function storeBasicInfo(Request $request)
-{
-    $validated = $request->validate([
-        'activity_title' => 'required|string|max:255',
-        'division_office' => 'required|string|max:255',
-        'fund_source' => 'required|string|max:255',
-        'activity_date' => 'required|date',
-        'expected_venue' => 'required|string|max:255',
-        'priority_level' => 'required|string|max:255',
-        'purpose_justification' => 'required|string',
-        'expected_output' => 'nullable|string',
-    ]);
+    {
+        $validated = $request->validate([
+            'activity_title' => 'required|string|max:255',
+            'division_office' => 'required|string|max:255',
+            'target_date' => 'required|date',
+            'purpose_objective' => 'required|string',
+            'estimated_amount' => 'required|numeric|min:0',
+            'fund_source' => 'required|in:MOOE,CO,PS',
+            'supporting_documents' => 'nullable|array',
+            'supporting_documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+        ]);
 
-    $status = $request->input('submit_action') === 'pending' ? 'pending' : 'draft';
+        $status = $request->input('submit_action') === 'draft' ? 'draft' : 'submitted_to_rd';
 
-    $remarks = "Activity Title: {$validated['activity_title']}\n"
-        . "Fund Source: {$validated['fund_source']}\n"
-        . "Expected Venue: {$validated['expected_venue']}\n"
-        . "Priority Level: {$validated['priority_level']}\n"
-        . "Expected Output: " . ($validated['expected_output'] ?? 'N/A');
+        $purchaseRequest = DB::transaction(function () use ($validated, $status, $request) {
+            $purchaseRequest = new PurchaseRequest();
+            $purchaseRequest->user_id = Auth::id();
+            $purchaseRequest->pr_number = $this->generatePrNumber();
+            $purchaseRequest->activity_title = $validated['activity_title'];
+            $purchaseRequest->office_department = $validated['division_office'];
+            $purchaseRequest->fund_source = $validated['fund_source'];
+            $purchaseRequest->purpose = $validated['purpose_objective'];
+            $purchaseRequest->request_date = now()->toDateString();
+            $purchaseRequest->target_date = $validated['target_date'];
+            $purchaseRequest->needed_date = $validated['target_date'];
+            $purchaseRequest->estimated_amount = $validated['estimated_amount'];
+            $purchaseRequest->total_amount = $validated['estimated_amount'];
+            $purchaseRequest->status = $status;
+            $purchaseRequest->remarks = 'Activity proposal submitted for RD review.';
+            $purchaseRequest->save();
 
-    $purchaseRequest = new PurchaseRequest();
-    $purchaseRequest->user_id = Auth::id();
-    $purchaseRequest->pr_number = $this->generatePrNumber();
-    $purchaseRequest->office_department = $validated['division_office'];
-    $purchaseRequest->purpose = $validated['purpose_justification'];
-    $purchaseRequest->request_date = now()->toDateString();
-    $purchaseRequest->needed_date = $validated['activity_date'];
-    $purchaseRequest->status = $status;
-    $purchaseRequest->total_amount = 0;
-    $purchaseRequest->remarks = $remarks;
-    $purchaseRequest->save();
+            $this->setLifecycle(
+                $purchaseRequest,
+                'activity_proposal',
+                'Activity Proposal',
+                $status === 'submitted_to_rd'
+                    ? 'Proposal submitted and pending RD approval'
+                    : 'Proposal saved as draft',
+                1,
+                true
+            );
 
-    $this->setLifecycle(
-        $purchaseRequest,
-        'activity_proposal',
-        'Activity Proposal',
-        $status === 'pending'
-            ? 'Proposal submitted and pending approval'
-            : 'Proposal saved as draft',
-        1,
-        true
-    );
+            $this->storeProposalAttachments($request, $purchaseRequest);
 
-    return redirect()
-        ->route('enduser.requests.index', $purchaseRequest->id)
-        ->with('success', $status === 'pending'
-            ? 'Proposal submitted successfully.'
-            : 'Proposal saved as draft.');
-}
+            if ($status === 'submitted_to_rd') {
+                $this->notifyApprovers(
+                    $purchaseRequest,
+                    'New Activity Proposal',
+                    $validated['activity_title'] . ' is waiting for RD review.'
+                );
+            }
+
+            return $purchaseRequest;
+        });
+
+        return redirect()
+            ->route('enduser.dashboard')
+            ->with('success', $status === 'submitted_to_rd'
+                ? 'Proposal submitted successfully and is now pending RD approval.'
+                : 'Proposal saved as draft.');
+    }
 
 
     public function updateBasicInfo(Request $request, $id)
@@ -264,25 +290,25 @@ class PurchaseRequestController extends Controller
     public function submitProposal($id)
 {
     $purchaseRequest = $this->ownedRequest($id);
-    $purchaseRequest->status = 'submitted_to_procurement';
+    $purchaseRequest->status = 'submitted_to_rd';
     $purchaseRequest->save();
 
     $this->replaceLifecycle(
         $purchaseRequest,
-        'submitted_to_procurement',
-        'Submitted to Procurement',
-        'Your purchase request has been submitted to Procurement.',
+        'submitted_to_rd',
+        'Submitted to RD',
+        'Your activity proposal has been submitted to the Regional Director for approval.',
         1,
         true
     );
 
-    $this->notifyUser(
+    $this->notifyApprovers(
         $purchaseRequest,
-        'Proposal Submitted',
-        'Your purchase request has been submitted to Procurement.'
+        'New Activity Proposal',
+        $purchaseRequest->activity_title . ' is waiting for RD review.'
     );
 
-    return back()->with('success', 'Proposal submitted successfully.');
+    return back()->with('success', 'Proposal submitted successfully and is now pending RD approval.');
 }
    public function submitToProcurement($id)
 {
@@ -416,6 +442,24 @@ class PurchaseRequestController extends Controller
         $attachment->save();
     }
 
+    private function storeProposalAttachments(Request $request, PurchaseRequest $purchaseRequest): void
+    {
+        if (! $request->hasFile('supporting_documents')) {
+            return;
+        }
+
+        foreach ($request->file('supporting_documents') as $file) {
+            $path = $file->store('purchase_requests/proposals', 'public');
+
+            $purchaseRequest->attachments()->create([
+                'file_type' => 'supporting_document',
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'remarks' => 'Uploaded with activity proposal',
+            ]);
+        }
+    }
+
     private function setLifecycle(
         PurchaseRequest $purchaseRequest,
         string $statusKey,
@@ -473,5 +517,20 @@ class PurchaseRequestController extends Controller
         $notification->message = $message;
         $notification->is_read = false;
         $notification->save();
+    }
+
+    private function notifyApprovers(PurchaseRequest $purchaseRequest, string $title, string $message): void
+    {
+        $approvers = User::role('Approver')->get();
+
+        foreach ($approvers as $approver) {
+            UserNotification::create([
+                'user_id' => $approver->id,
+                'purchase_request_id' => $purchaseRequest->id,
+                'title' => $title,
+                'message' => $message,
+                'is_read' => false,
+            ]);
+        }
     }
 }

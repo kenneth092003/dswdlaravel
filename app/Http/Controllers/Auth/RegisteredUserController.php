@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -29,10 +30,12 @@ class RegisteredUserController extends Controller
             'employee_id' => ['required', 'string', 'max:50', 'unique:users,employee_id'],
             'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password'    => ['required', 'confirmed', Rules\Password::defaults()],
-            'role'        => ['required', Rule::in(['End User', 'Procurement', 'FA II', 'Super Admin'])],
+            'role'        => ['required', Rule::in(['End User', 'Approver', 'Procurement', 'FA II', 'Super Admin'])],
         ]);
 
         $user = DB::transaction(function () use ($request) {
+            Role::findOrCreate($request->role, 'web');
+
             $user = User::create([
                 'employee_id' => $request->employee_id,
                 'firstname'   => $request->firstname,

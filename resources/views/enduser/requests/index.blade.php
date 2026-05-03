@@ -210,7 +210,15 @@
                                             <a href="{{ route('enduser.requests.edit', $request->id) }}"
                                                class="view-btn"
                                                style="color:#8a5b00;border-color:#e1b841;">
-                                                Edit
+                                                Edit Proposal
+                                            </a>
+                                        @endif
+
+                                        @if($request->status === 'approved')
+                                            <a href="{{ route('enduser.requests.draft.pr', $request->id) }}"
+                                               class="view-btn"
+                                               style="color:#1f3f7d;border-color:#6c8bb3;">
+                                                Draft PR
                                             </a>
                                         @endif
                                     </div>

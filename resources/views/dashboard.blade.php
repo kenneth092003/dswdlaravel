@@ -50,6 +50,16 @@
                         </div>
                     @endrole
 
+                    @role('Approver')
+                        <div class="mt-6">
+                            <h3 class="text-lg font-bold">Approver Dashboard</h3>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Review proposals submitted by End Users</li>
+                                <li>Approve or return PRs for revision</li>
+                            </ul>
+                        </div>
+                    @endrole
+
                     {{-- Budget dashboard --}}
                     @role('Budget')
                         <div class="mt-6">

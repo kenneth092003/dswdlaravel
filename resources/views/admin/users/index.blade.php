@@ -25,6 +25,7 @@
         }
         .badge-approved { background:#d1fae5; color:#065f46; }
         .badge-enduser { background:#dbeafe; color:#1e40af; }
+        .badge-approver { background:#ffedd5; color:#c2410c; }
         .badge-procurement { background:#ede9fe; color:#5b21b6; }
         .badge-faii { background:#fef9c3; color:#92400e; }
         .badge-superadmin { background:#fee2e2; color:#991b1b; }
@@ -290,7 +291,7 @@
                             @foreach ($users as $u)
                                 @php
                                     $roleName = strtolower(str_replace([' ','_'], '-', $u->getRoleNames()->first() ?? ''));
-                                    $badgeMap = ['super-admin'=>'badge-superadmin','end-user'=>'badge-enduser','procurement'=>'badge-procurement','fa-ii'=>'badge-faii'];
+                                    $badgeMap = ['super-admin'=>'badge-superadmin','end-user'=>'badge-enduser','approver'=>'badge-approver','procurement'=>'badge-procurement','fa-ii'=>'badge-faii'];
                                     $badgeClass = $badgeMap[$roleName] ?? 'badge-enduser';
                                     $initials = strtoupper(substr($u->firstname,0,1).substr($u->lastname,0,1));
                                     $avatarColors = ['bg-blue-600','bg-purple-600','bg-green-600','bg-rose-500','bg-amber-500'];

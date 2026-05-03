@@ -63,6 +63,10 @@ class DashboardController extends Controller
             return redirect()->route('procurement.dashboard');
         }
 
+        if ($user->hasRole('Approver')) {
+            return redirect()->route('approver.dashboard');
+        }
+
         abort(403, 'Unauthorized.');
     }
 }

@@ -9,6 +9,13 @@
             Dashboard
         </a>
 
+        @role('Approver')
+            <a href="{{ route('approver.dashboard') }}"
+               class="block px-3 py-2 rounded hover:bg-gray-100">
+                Approver Dashboard
+            </a>
+        @endrole
+
         @role('Super Admin')
             <a href="{{ route('admin.users.index') }}"
                class="block px-3 py-2 rounded hover:bg-gray-100">

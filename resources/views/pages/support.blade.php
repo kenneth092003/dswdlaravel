@@ -326,6 +326,7 @@
                                     <select name="role" class="w-full border border-slate-300 bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
                                         <option value="" disabled {{ old('role') ? '' : 'selected' }}>— Select Role —</option>
                                         <option value="End User" {{ old('role') === 'End User' ? 'selected' : '' }}>End User</option>
+                                        <option value="Approver" {{ old('role') === 'Approver' ? 'selected' : '' }}>Approver</option>
                                         <option value="Procurement" {{ old('role') === 'Procurement' ? 'selected' : '' }}>Procurement</option>
                                         <option value="FA II" {{ old('role') === 'FA II' ? 'selected' : '' }}>FA II</option>
                                         <option value="Super Admin" {{ old('role') === 'Super Admin' ? 'selected' : '' }}>Super Admin</option>

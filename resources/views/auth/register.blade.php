@@ -145,6 +145,7 @@
                             class="mt-2 w-full rounded-xl border-slate-300 focus:border-slate-700 focus:ring-slate-700 py-3 px-4">
                         <option value="" disabled @selected(old('role') === null)>Select role</option>
                         <option value="End User" @selected(old('role')==='End User')>Enduser</option>
+                        <option value="Approver" @selected(old('role')==='Approver')>Approver</option>
                         <option value="Procurement" @selected(old('role')==='Procurement')>Procurement</option>
                         <option value="FA II" @selected(old('role')==='FA II')>FA II</option>
                         <option value="Super Admin" @selected(old('role')==='Super Admin')>Super Admin</option>

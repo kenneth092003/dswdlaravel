@@ -1,45 +1,31 @@
 {{-- resources/views/enduser/requests/create.blade.php --}}
-@extends('layouts.enduser-internal', ['title' => 'End User - New Proposal / Basic Info'])
+@extends('layouts.enduser-internal', ['title' => 'End User - New Activity Proposal'])
 
 @section('content')
     <div class="wizard-overlay">
-        <div class="wizard">
+        <div class="wizard" style="max-width:1100px;">
             <div class="wizard-header">
                 <div>
                     <div class="wizard-title">New Activity Proposal</div>
-                    <div class="wizard-sub">Complete all steps before submitting for RD approval</div>
+                    <div class="wizard-sub">Submit your proposal to the RD/Approver for review.</div>
                 </div>
-                <a href="{{ route('enduser.requests.index') }}" class="close-x" style="text-decoration:none;color:#fff;">×</a>
+                <a href="{{ route('enduser.dashboard') }}" class="close-x" style="text-decoration:none;color:#fff;">&times;</a>
             </div>
 
-            <div class="steps">
-                <div class="step active">
-                    <div class="step-circle">1</div>
-                    <span>Basic Info</span>
-                </div>
-                <div class="step">
-                    <div class="step-circle">2</div>
-                    <span>Items &amp; Initial Attachments</span>
-                </div>
-                <div class="step">
-                    <div class="step-circle">3</div>
-                    <span>Final Attachments</span>
-                </div>
-            </div>
-
-            <form method="POST" action="{{ route('enduser.requests.store.basic') }}">
+            <form method="POST" action="{{ route('enduser.requests.store.basic') }}" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="submit_action" value="pending">
 
                 <div class="wizard-body">
                     <div class="hint-box">
-                        Fill in the details of your activity proposal. This will be reviewed and approved by the Regional Director before proceeding to procurements.
+                        Fill in the details of your activity proposal. Once submitted, it will be queued for RD approval.
                     </div>
 
-                    <div class="section-title">Activity Information</div>
+                    <div class="section-title">Activity Proposal</div>
 
                     <div class="grid-3">
                         <div class="field">
-                            <label>Activity / Proposal Title *</label>
+                            <label>Activity Title *</label>
                             <input type="text" name="activity_title" value="{{ old('activity_title') }}">
                         </div>
                         <div class="field">
@@ -47,45 +33,42 @@
                             <input type="text" name="division_office" value="{{ old('division_office') }}">
                         </div>
                         <div class="field">
-                            <label>Fund Source *</label>
-                            <input type="text" name="fund_source" value="{{ old('fund_source') }}">
+                            <label>Target Date *</label>
+                            <input type="date" name="target_date" value="{{ old('target_date') }}">
                         </div>
                     </div>
 
                     <div class="grid-3" style="margin-top:10px;">
                         <div class="field">
-                            <label>Activity Date *</label>
-                            <input type="date" name="activity_date" value="{{ old('activity_date') }}">
+                            <label>Purpose / Objective *</label>
+                            <textarea name="purpose_objective">{{ old('purpose_objective') }}</textarea>
                         </div>
                         <div class="field">
-                            <label>Expected Venue *</label>
-                            <input type="text" name="expected_venue" value="{{ old('expected_venue') }}">
+                            <label>Estimated Amount *</label>
+                            <input type="number" step="0.01" min="0" name="estimated_amount" value="{{ old('estimated_amount') }}">
                         </div>
                         <div class="field">
-                            <label>Priority Level *</label>
-                            <input type="text" name="priority_level" value="{{ old('priority_level') }}">
+                            <label>Fund Source *</label>
+                            <select name="fund_source">
+                                <option value="">Select</option>
+                                <option value="MOOE" @selected(old('fund_source') === 'MOOE')>MOOE</option>
+                                <option value="CO" @selected(old('fund_source') === 'CO')>CO</option>
+                                <option value="PS" @selected(old('fund_source') === 'PS')>PS</option>
+                            </select>
                         </div>
-                    </div>
-
-                    <div class="section-title">Justification</div>
-
-                    <div class="field">
-                        <label>Purpose / Justification *</label>
-                        <textarea name="purpose_justification">{{ old('purpose_justification') }}</textarea>
                     </div>
 
                     <div class="field" style="margin-top:10px;">
-                        <label>Expected Output / Deliverables</label>
-                        <textarea name="expected_output">{{ old('expected_output') }}</textarea>
+                        <label>Upload Supporting Documents</label>
+                        <input type="file" name="supporting_documents[]" multiple>
                     </div>
                 </div>
 
                 <div class="wizard-footer">
-                    <div class="footer-note">Step 1 of 3 — Activity Proposal</div>
+                    <div class="footer-note">After submit, the proposal will be visible to the Approver.</div>
                     <div class="actions">
-                        <a href="{{ route('enduser.requests.index') }}" class="btn-outline">Cancel</a>
-                        <button type="submit" name="submit_action" value="draft" class="btn-red">Draft Proposal</button>
-                        <button type="submit" name="submit_action" value="pending" class="btn-green">Submit Proposal</button>
+                        <a href="{{ route('enduser.dashboard') }}" class="btn-outline">Cancel</a>
+                        <button type="submit" class="btn-green">Submit Proposal</button>
                     </div>
                 </div>
             </form>

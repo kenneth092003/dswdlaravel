@@ -27,6 +27,7 @@ use App\Http\Controllers\EndUser\EnduserDashboardController;
 use App\Http\Controllers\EndUser\PurchaseRequestController;
 use App\Http\Controllers\EndUser\ProfileController as EndUserProfileController;
 use App\Http\Controllers\EndUser\NotificationController;
+use App\Http\Controllers\Approver\ApproverDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +112,7 @@ Route::middleware(['auth', 'role:End User'])
         Route::get('/requests', [PurchaseRequestController::class, 'index'])->name('requests.index');
         Route::get('/requests/create', [PurchaseRequestController::class, 'create'])->name('requests.create');
         Route::get('/requests/{id}', [PurchaseRequestController::class, 'show'])->name('requests.show');
+        Route::get('/requests/{id}/draft-pr', [PurchaseRequestController::class, 'draftPurchaseRequest'])->name('requests.draft.pr');
         Route::get('/requests/{id}/edit', [PurchaseRequestController::class, 'edit'])->name('requests.edit');
         Route::get('/requests/{id}/lifecycle', [PurchaseRequestController::class, 'lifecycle'])->name('requests.lifecycle');
 
@@ -141,6 +143,17 @@ Route::middleware(['auth', 'role:End User'])
 | Procurement
 |--------------------------------------------------------------------------
 */
+
+Route::middleware(['auth', 'role:Approver'])
+    ->prefix('approver')
+    ->name('approver.')
+    ->group(function () {
+        Route::get('/dashboard', [ApproverDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/requests', [ApproverDashboardController::class, 'requests'])->name('requests.index');
+        Route::get('/requests/{id}', [ApproverDashboardController::class, 'show'])->name('requests.show');
+        Route::post('/requests/{id}/approve', [ApproverDashboardController::class, 'approve'])->name('requests.approve');
+        Route::post('/requests/{id}/reject', [ApproverDashboardController::class, 'reject'])->name('requests.reject');
+    });
 
 Route::middleware(['auth', 'role:Procurement'])
     ->prefix('procurement')

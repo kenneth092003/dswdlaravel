@@ -16,7 +16,7 @@ class RolesSeeder extends Seeder
             ->delete();
 
         // ✅ Create correct role names (must match exactly what the code checks)
-        foreach (['Super Admin', 'End User', 'Procurement', 'FA II'] as $r) {
+        foreach (['Super Admin', 'End User', 'Approver', 'Procurement', 'FA II'] as $r) {
             Role::firstOrCreate(['name' => $r, 'guard_name' => 'web']);
         }
 

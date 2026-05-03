@@ -125,7 +125,7 @@
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-blue-700 mb-1">Role-Based Access Control</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Four distinct roles — End User, Procurement, FA II, and Super Admin — each with tailored dashboards showing only the screens and actions relevant to their function.</p>
+                    <p class="text-gray-500 text-sm leading-relaxed">Five distinct roles - End User, Approver, Procurement, FA II, and Super Admin - each with tailored dashboards showing only the screens and actions relevant to their function.</p>
                 </div>
             </div>
 
@@ -169,6 +169,18 @@
                 </div>
                 <h4 class="font-bold text-sm mb-2" style="color: #6d28d9;">Procurement</h4>
                 <p class="text-xs leading-relaxed" style="color: #6b7280;">Approves proposals, runs BAC process, signs PRs</p>
+            </div>
+
+            {{-- Approver --}}
+            <div class="float-card flex-1 rounded-2xl p-6 flex flex-col items-center text-center"
+                 style="background-color: #fff7ed; border: 2px solid #fdba74;">
+                <div class="mb-3">
+                    <svg viewBox="0 0 24 24" class="w-8 h-8 fill-current" style="color: #ea580c;">
+                        <path d="M12 2l3.5 7.1L23 10l-5.5 5.3L18.8 23 12 19.3 5.2 23 7.5 15.3 2 10l7.5-.9L12 2z" />
+                    </svg>
+                </div>
+                <h4 class="font-bold text-sm mb-2" style="color: #c2410c;">Approver</h4>
+                <p class="text-xs leading-relaxed" style="color: #6b7280;">Reviews and signs off proposals before procurement</p>
             </div>
 
             {{-- FA II --}}

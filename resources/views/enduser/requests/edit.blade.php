@@ -48,19 +48,23 @@
                         <td>
                             <input type="text"
                                    name="items[{{ $index }}][item_description]"
+                                   class="item-description"
                                    value="{{ $item['item_description'] ?? '' }}"
                                    style="background:#fbfdff;">
                         </td>
                         <td>
                             <input type="text"
                                    name="items[{{ $index }}][unit]"
+                                   class="item-unit"
                                    value="{{ $item['unit'] ?? '' }}"
                                    style="background:#fbfdff;">
                         </td>
                         <td>
                             <input type="number"
                                    min="1"
+                                   step="1"
                                    name="items[{{ $index }}][qty]"
+                                   class="item-qty"
                                    value="{{ $item['qty'] ?? 1 }}"
                                    style="background:#fbfdff;">
                         </td>
@@ -69,11 +73,13 @@
                                    step="0.01"
                                    min="0"
                                    name="items[{{ $index }}][estimated_unit_cost]"
+                                   class="item-cost"
                                    value="{{ $item['estimated_unit_cost'] ?? 0 }}"
                                    style="background:#fbfdff;">
                         </td>
                         <td>
                             <input type="text"
+                                   class="row-total"
                                    value="{{ number_format($lineTotal, 2) }}"
                                    readonly
                                    style="background:#f8fafc;color:#274a85;font-weight:700;">
@@ -87,7 +93,7 @@
     <div style="margin-top:14px;padding:14px 16px;border:1px solid #d9e2ee;border-radius:12px;background:#f8fbff;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
         <div>
             <div class="muted" style="font-size:12px;">Total Estimated Amount</div>
-            <div style="font-size:28px;font-weight:700;color:#274a85;line-height:1.1;">
+            <div id="grand-total" style="font-size:28px;font-weight:700;color:#274a85;line-height:1.1;">
                 ₱ {{ number_format((float) ($purchaseRequest->estimated_total ?? $purchaseRequest->total_amount ?? 0), 2) }}
             </div>
         </div>
@@ -196,3 +202,51 @@
         </table>
     </div>
 @endif
+
+<script>
+    (function () {
+        const formatCurrency = (value) => {
+            const amount = Number.isFinite(value) ? value : 0;
+            return amount.toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+        };
+
+        const recalculateTotals = () => {
+            const rows = document.querySelectorAll('.table-wrap tbody tr');
+            let grandTotal = 0;
+
+            rows.forEach((row) => {
+                const qtyInput = row.querySelector('.item-qty');
+                const costInput = row.querySelector('.item-cost');
+                const totalInput = row.querySelector('.row-total');
+
+                if (!qtyInput || !costInput || !totalInput) {
+                    return;
+                }
+
+                const qty = parseFloat(qtyInput.value) || 0;
+                const cost = parseFloat(costInput.value) || 0;
+                const lineTotal = qty * cost;
+
+                grandTotal += lineTotal;
+                totalInput.value = formatCurrency(lineTotal);
+            });
+
+            const grandTotalNode = document.getElementById('grand-total');
+            if (grandTotalNode) {
+                grandTotalNode.textContent = `₱ ${formatCurrency(grandTotal)}`;
+            }
+        };
+
+        document.addEventListener('input', (event) => {
+            if (event.target.matches('.item-qty, .item-cost')) {
+                recalculateTotals();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', recalculateTotals);
+        recalculateTotals();
+    })();
+</script>

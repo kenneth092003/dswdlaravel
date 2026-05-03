@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    private const AVAILABLE_ROLES = ['End User', 'Procurement', 'FA II', 'Super Admin'];
+    private const AVAILABLE_ROLES = ['End User', 'Approver', 'Procurement', 'FA II', 'Super Admin'];
 
     public function index()
     {

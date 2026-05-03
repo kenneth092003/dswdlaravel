@@ -37,6 +37,12 @@
                 Edit
             </a>
         @endif
+
+        @if($purchaseRequest->status === 'approved')
+            <a href="{{ route('enduser.requests.draft.pr', $purchaseRequest->id) }}" class="btn-primary-dark">
+                Draft PR
+            </a>
+        @endif
     </div>
 </div>
 
@@ -48,8 +54,8 @@
 
         {{-- BASIC INFO --}}
         <div class="panel">
-            <div class="panel-header">Basic Information</div>
-            <div class="panel-body">
+                    <div class="panel-header">Basic Information</div>
+                    <div class="panel-body">
 
                 <div class="grid-3">
                     <div class="field">
@@ -104,11 +110,11 @@
                         <input type="text" value="{{ $purchaseRequest->expected_venue ?? '-' }}" readonly>
                     </div>
 
-                    <div class="field">
-                        <label>Priority Level</label>
-                        <input type="text" value="{{ $purchaseRequest->priority_level ?? '-' }}" readonly>
+                        <div class="field">
+                            <label>Priority Level</label>
+                            <input type="text" value="{{ $purchaseRequest->priority_level ?? '-' }}" readonly>
+                        </div>
                     </div>
-                </div>
 
                 <div class="field" style="margin-top:10px;">
                     <label>Purpose</label>
@@ -190,6 +196,11 @@
             <div class="panel-body">
                 <div>Submitted: {{ optional($purchaseRequest->created_at)->format('M d, Y') }}</div>
                 <div>Updated: {{ optional($purchaseRequest->updated_at)->format('M d, Y') }}</div>
+                @if($purchaseRequest->status === 'approved')
+                    <div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:#eef6ff;color:#1f3f7d;font-size:12px;font-weight:700;">
+                        Proposal approved. You can now draft the Purchase Request.
+                    </div>
+                @endif
             </div>
         </div>
 

@@ -33,13 +33,13 @@
 
             return match ($status) {
                 'draft' => 'Draft Proposal Created',
-                'pending', 'submitted_to_rd' => 'Facilitate Signature of Proposal',
+                'pending', 'submitted_to_rd' => 'Waiting for RD Approval',
                 'submitted_to_procurement', 'processing', 'bac_processing' => 'Receive Proposal Notification',
                 'approved', 'final_approved' => 'Sign Activity Proposal',
                 'signed_pr' => 'Submit Final Docs for Payment',
                 'validated_payment' => 'Prepare OBR for DC Signature',
                 'returned', 'rejected', 'with_findings' => 'Review / Revise Draft Proposal',
-                default => 'Facilitate Signature of Proposal',
+                default => 'Waiting for RD Approval',
             };
         };
 
@@ -117,10 +117,11 @@
                     </svg>
                 </div>
 
-                <a href="{{ route('enduser.requests.create') }}"
-                    style="display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 16px;background:#2459d3;color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;">
+                <button type="button"
+                    onclick="openProposalModal()"
+                    style="display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 16px;background:#2459d3;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
                     + New Activity Proposal
-                </a>
+                </button>
             </div>
         </div>
 
@@ -164,16 +165,17 @@
 
                                 <td>
                                     <div style="font-weight:700;color:#111827;font-size:12px;">
-                                        {{ $request->purpose ?? $request->title ?? $request->activity_title ?? '-' }}
+                                        {{ $request->activity_title ?? $request->purpose ?? $request->title ?? '-' }}
                                     </div>
                                     <div class="muted" style="font-size:11px;">
-                                        ₱{{ number_format((float) ($request->total_amount ?? $request->estimated_total ?? 0), 2) }}
-                                        @if(($request->priority_level ?? null) || ($request->division_office ?? $request->office_department ?? null))
-                                            · {{ $request->priority_level ?? 'Normal' }}
-                                            @if($request->division_office ?? $request->office_department ?? null)
-                                                · {{ $request->division_office ?? $request->office_department }}
+                                        {{ $request->purpose ?? 'Activity proposal' }}
+                                        @if(($request->fund_source ?? null) || ($request->office_department ?? null))
+                                            · {{ $request->fund_source ?? 'MOOE' }}
+                                            @if($request->office_department ?? null)
+                                                · {{ $request->office_department }}
                                             @endif
                                         @endif
+                                        · ₱{{ number_format((float) ($request->estimated_amount ?? $request->total_amount ?? 0), 2) }}
                                     </div>
                                 </td>
 
@@ -204,6 +206,13 @@
                                             ACT
                                         </a>
 
+                                        @if($request->status === 'approved')
+                                            <a href="{{ route('enduser.requests.draft.pr', $request->id) }}"
+                                                style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:22px;background:#1f3f7d;color:#fff;border-radius:6px;font-size:9px;font-weight:700;text-decoration:none;">
+                                                PR
+                                            </a>
+                                        @endif
+
                                         <a href="{{ route('enduser.requests.show', $request->id) }}"
                                             style="display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:22px;border:1px solid #d5dbe5;color:#7b8794;border-radius:6px;font-size:9px;font-weight:700;text-decoration:none;background:#fff;">
                                             HISTORY
@@ -221,5 +230,114 @@
             </div>
         </div>
     </div>
+
+    <div id="proposal-modal"
+         style="display:none;position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.62);padding:18px;overflow:auto;">
+        <div style="max-width:860px;margin:3vh auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 28px 60px rgba(2,6,23,.35);">
+            <div style="background:linear-gradient(135deg,#0f172a,#1d4ed8);color:#fff;padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+                <div>
+                    <div style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;opacity:.8;">End-User</div>
+                    <div style="font-size:22px;font-weight:900;margin-top:6px;">Create Activity Proposal</div>
+                    <div style="font-size:13px;opacity:.85;margin-top:6px;">Submit first to the RD/Approver for review.</div>
+                </div>
+                <button type="button" onclick="closeProposalModal()"
+                        style="width:36px;height:36px;border:none;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+            </div>
+
+            <form method="POST" action="{{ route('enduser.requests.store.basic') }}" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="submit_action" value="pending">
+
+                <div style="padding:24px;background:#f8fafc;">
+                    <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;">
+                        <div class="field">
+                            <label>Activity Title *</label>
+                            <input type="text" name="activity_title" value="{{ old('activity_title') }}" placeholder="Enter activity title">
+                        </div>
+                        <div class="field">
+                            <label>Division / Office *</label>
+                            <input type="text" name="division_office" value="{{ old('division_office') }}" placeholder="Division or office">
+                        </div>
+                        <div class="field">
+                            <label>Target Date *</label>
+                            <input type="date" name="target_date" value="{{ old('target_date') }}">
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 220px 180px;gap:14px;margin-top:14px;">
+                        <div class="field">
+                            <label>Purpose / Objective *</label>
+                            <textarea name="purpose_objective" placeholder="Describe the purpose of the activity">{{ old('purpose_objective') }}</textarea>
+                        </div>
+                        <div class="field">
+                            <label>Estimated Amount *</label>
+                            <input type="number" step="0.01" min="0" name="estimated_amount" value="{{ old('estimated_amount') }}" placeholder="0.00">
+                        </div>
+                        <div class="field">
+                            <label>Fund Source *</label>
+                            <select name="fund_source">
+                                <option value="">Select</option>
+                                <option value="MOOE" @selected(old('fund_source') === 'MOOE')>MOOE</option>
+                                <option value="CO" @selected(old('fund_source') === 'CO')>CO</option>
+                                <option value="PS" @selected(old('fund_source') === 'PS')>PS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field" style="margin-top:14px;">
+                        <label>Upload Supporting Documents</label>
+                        <input type="file" name="supporting_documents[]" multiple>
+                    </div>
+                </div>
+
+                <div style="padding:14px 24px;background:#fff;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <div style="font-size:12px;color:#64748b;">Once submitted, the proposal will go to the Approver for review.</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button type="button" onclick="closeProposalModal()"
+                                style="height:38px;padding:0 16px;border:1px solid #cbd5e1;background:#fff;border-radius:10px;font-weight:700;color:#334155;cursor:pointer;">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                style="height:38px;padding:0 18px;border:none;background:#1d4ed8;color:#fff;border-radius:10px;font-weight:800;cursor:pointer;">
+                            Submit Proposal
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openProposalModal() {
+            const modal = document.getElementById('proposal-modal');
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeProposalModal() {
+            const modal = document.getElementById('proposal-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeProposalModal();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            const modal = document.getElementById('proposal-modal');
+            if (!modal || modal.style.display === 'none') {
+                return;
+            }
+
+            if (event.target === modal) {
+                closeProposalModal();
+            }
+        });
+
+        @if($errors->any())
+            openProposalModal();
+        @endif
+    </script>
 
 @endsection

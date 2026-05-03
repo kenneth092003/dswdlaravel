@@ -52,6 +52,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('dashboard');
         }
 
+        if ($user->role === 'Approver') {
+            return redirect()->route('approver.dashboard');
+        }
+
         return redirect()->route('dashboard');
     }
     /**
