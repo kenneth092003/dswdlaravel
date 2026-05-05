@@ -27,7 +27,7 @@ class RolesSeeder extends Seeder
                 'firstname'   => 'System',
                 'lastname'    => 'Administrator',
                 'employee_id' => '000001',
-                'password'    => Hash::make('password'),
+                'password'    => Hash::make('password123'),
                 'is_approved' => true,
                 'approved_at' => now(),
                 'role'        => 'Super Admin',

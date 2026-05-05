@@ -16,6 +16,8 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            {{-- Hero Banner --}}
             <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-blue-800 text-white overflow-hidden shadow-sm sm:rounded-2xl">
                 <div class="p-8 md:p-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     <div>
@@ -47,6 +49,7 @@
                 </div>
             </div>
 
+            {{-- Steps --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-200 p-6">
                     <div class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">Step 1</div>
@@ -73,6 +76,14 @@
                 </div>
             </div>
 
+            {{-- Flash Messages --}}
+            @if(session('success'))
+                <div class="rounded-xl bg-green-50 border border-green-200 px-5 py-3 text-sm text-green-800 font-semibold">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Recent Requests Table --}}
             <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between gap-4">
                     <div>
@@ -100,7 +111,8 @@
                         <tbody class="divide-y divide-gray-100 bg-white">
                             @forelse($requests as $request)
                                 @php
-                                    $requesterName = $request->user?->full_name ?: trim(($request->user?->firstname ?? '') . ' ' . ($request->user?->lastname ?? ''));
+                                    $requesterName = $request->user?->full_name
+                                        ?: trim(($request->user?->firstname ?? '') . ' ' . ($request->user?->lastname ?? ''));
                                     $isReviewable = in_array(strtolower((string) $request->status), ['pending', 'submitted_to_rd']);
                                 @endphp
                                 <tr>
@@ -115,40 +127,51 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {{ $requesterName !== '' ? $requesterName : 'Unknown' }}
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $request->purpose ?? '-' }}
+                                    <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">
+                                        {{ $request->activity_title ?? $request->purpose ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @php
                                             $status = strtolower((string) ($request->status ?? 'pending'));
                                         @endphp
                                         <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold
-                                            @if(in_array($status, ['approved'])) bg-green-100 text-green-800
+                                            @if($status === 'approved') bg-green-100 text-green-800
                                             @elseif(in_array($status, ['returned', 'rejected'])) bg-red-100 text-red-800
                                             @else bg-amber-100 text-amber-800 @endif">
                                             {{ str_replace('_', ' ', $request->status ?? 'pending') }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($isReviewable)
-                                            <div class="flex flex-wrap gap-2">
+                                        <div class="flex flex-wrap gap-2">
+
+                                            {{-- ✅ View button — goes to show page with attachments --}}
+                                            <a href="{{ route('approver.requests.show', $request->id) }}"
+                                               class="inline-flex rounded-lg bg-blue-950 px-3 py-2 text-xs font-bold text-white hover:bg-blue-800">
+                                                View
+                                            </a>
+
+                                            @if($isReviewable)
                                                 <form method="POST" action="{{ route('approver.requests.approve', $request->id) }}">
                                                     @csrf
-                                                    <button type="submit" class="inline-flex rounded-lg bg-green-600 px-3 py-2 text-xs font-bold text-white hover:bg-green-500">
+                                                    <button type="submit"
+                                                        class="inline-flex rounded-lg bg-green-600 px-3 py-2 text-xs font-bold text-white hover:bg-green-500">
                                                         Approve
                                                     </button>
                                                 </form>
-                                                <form method="POST" action="{{ route('approver.requests.reject', $request->id) }}" onsubmit="return confirmRejectProposal(this);">
+
+                                                <form method="POST" action="{{ route('approver.requests.reject', $request->id) }}"
+                                                      onsubmit="return confirmRejectProposal(this);">
                                                     @csrf
                                                     <input type="hidden" name="remarks" value="">
-                                                    <button type="submit" class="inline-flex rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-red-500">
+                                                    <button type="submit"
+                                                        class="inline-flex rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-red-500">
                                                         Reject
                                                     </button>
                                                 </form>
-                                            </div>
-                                        @else
-                                            <span class="text-xs text-gray-400">No action</span>
-                                        @endif
+                                            @else
+                                                <span class="text-xs text-gray-400 self-center">No action</span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -162,22 +185,18 @@
                     </table>
                 </div>
             </div>
+
         </div>
     </div>
-<script>
-    function confirmRejectProposal(form) {
-        const remarks = window.prompt('Add a short remark for the rejection (optional):', '');
-        if (remarks === null) {
-            return false;
-        }
 
-        const input = form.querySelector('input[name="remarks"]');
-        if (input) {
-            input.value = remarks;
+    <script>
+        function confirmRejectProposal(form) {
+            const remarks = window.prompt('Add a short remark for the rejection (optional):', '');
+            if (remarks === null) return false;
+            const input = form.querySelector('input[name="remarks"]');
+            if (input) input.value = remarks;
+            return true;
         }
-
-        return true;
-    }
-</script>
+    </script>
 
 </x-app-layout>

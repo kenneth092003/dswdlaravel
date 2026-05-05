@@ -153,6 +153,7 @@ Route::middleware(['auth', 'role:Approver'])
         Route::get('/requests/{id}', [ApproverDashboardController::class, 'show'])->name('requests.show');
         Route::post('/requests/{id}/approve', [ApproverDashboardController::class, 'approve'])->name('requests.approve');
         Route::post('/requests/{id}/reject', [ApproverDashboardController::class, 'reject'])->name('requests.reject');
+        Route::post('/requests/{id}/upload-signed', [ApproverDashboardController::class, 'uploadSigned'])->name('requests.upload.signed');
     });
 
 Route::middleware(['auth', 'role:Procurement'])
