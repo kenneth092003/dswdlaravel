@@ -46,7 +46,7 @@
     $signedDoc    = $purchaseRequest->attachments->where('file_type', 'signed_document')->first();
 @endphp
 
-{{-- ✅ Signed Document Alert --}}
+{{-- Signed Document Alert --}}
 @if($signedDoc)
     <div style="margin-bottom:14px;padding:14px 18px;background:#eef6ff;border:1.5px solid #b6d4fe;border-radius:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -77,6 +77,8 @@
         <div class="panel">
             <div class="panel-header">Basic Information</div>
             <div class="panel-body">
+
+                {{-- Row 1 --}}
                 <div class="grid-3">
                     <div class="field">
                         <label>Doc Number</label>
@@ -89,21 +91,20 @@
                     <div class="field">
                         <label>Date Filed</label>
                         <input type="text"
-                            value="{{ !empty($purchaseRequest->date_filed ?? $purchaseRequest->request_date)
-                                ? \Carbon\Carbon::parse($purchaseRequest->date_filed ?? $purchaseRequest->request_date)->format('M d, Y')
-                                : '-' }}"
+                            value="{{ !empty($purchaseRequest->request_date) ? \Carbon\Carbon::parse($purchaseRequest->request_date)->format('M d, Y') : '-' }}"
                             readonly>
                     </div>
                 </div>
 
+                {{-- Row 2 --}}
                 <div class="grid-3" style="margin-top:10px;">
                     <div class="field">
                         <label>Activity Title</label>
-                        <input type="text" value="{{ $purchaseRequest->activity_title ?? $purchaseRequest->purpose ?? '-' }}" readonly>
+                        <input type="text" value="{{ $purchaseRequest->activity_title ?? '-' }}" readonly>
                     </div>
                     <div class="field">
                         <label>Division / Office</label>
-                        <input type="text" value="{{ $purchaseRequest->division_office ?? $purchaseRequest->office_department ?? '-' }}" readonly>
+                        <input type="text" value="{{ $purchaseRequest->office_department ?? '-' }}" readonly>
                     </div>
                     <div class="field">
                         <label>Fund Source</label>
@@ -111,13 +112,12 @@
                     </div>
                 </div>
 
+                {{-- ✅ Row 3: Activity Date, Venue, Estimated Amount (Target Date removed) --}}
                 <div class="grid-3" style="margin-top:10px;">
                     <div class="field">
                         <label>Activity Date</label>
                         <input type="text"
-                            value="{{ !empty($purchaseRequest->activity_date)
-                                ? \Carbon\Carbon::parse($purchaseRequest->activity_date)->format('M d, Y')
-                                : '-' }}"
+                            value="{{ !empty($purchaseRequest->activity_date) ? \Carbon\Carbon::parse($purchaseRequest->activity_date)->format('M d, Y') : '-' }}"
                             readonly>
                     </div>
                     <div class="field">
@@ -125,15 +125,17 @@
                         <input type="text" value="{{ $purchaseRequest->expected_venue ?? '-' }}" readonly>
                     </div>
                     <div class="field">
-                        <label>Priority Level</label>
-                        <input type="text" value="{{ $purchaseRequest->priority_level ?? '-' }}" readonly>
+                        <label>Estimated Amount</label>
+                        <input type="text" value="₱{{ number_format($purchaseRequest->estimated_amount ?? 0, 2) }}" readonly>
                     </div>
                 </div>
 
+                {{-- Purpose --}}
                 <div class="field" style="margin-top:10px;">
-                    <label>Purpose</label>
-                    <textarea readonly>{{ $purchaseRequest->purpose_justification ?? $purchaseRequest->purpose ?? '-' }}</textarea>
+                    <label>Purpose / Objective</label>
+                    <textarea readonly>{{ $purchaseRequest->purpose ?? '-' }}</textarea>
                 </div>
+
             </div>
         </div>
 
@@ -162,7 +164,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="empty-card">No items</td>
+                                <td colspan="5" class="empty-card">No items added yet.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -170,7 +172,7 @@
             </div>
         </div>
 
-        {{-- ATTACHMENTS --}}
+        {{-- MY UPLOADED DOCUMENTS --}}
         <div class="panel">
             <div class="panel-header">My Uploaded Documents</div>
             <div class="table-wrap">
@@ -185,19 +187,19 @@
                     <tbody>
                         @forelse($originalDocs as $file)
                             @php
-                                $ext = strtolower(pathinfo($file->file_name, PATHINFO_EXTENSION));
+                                $ext   = strtolower(pathinfo($file->file_name, PATHINFO_EXTENSION));
                                 $label = match($ext) {
-                                    'pdf'           => 'PDF',
-                                    'doc', 'docx'   => 'DOC',
-                                    'xls', 'xlsx'   => 'XLS',
-                                    'jpg','jpeg','png' => 'IMG',
-                                    default         => strtoupper($ext),
+                                    'pdf'              => 'PDF',
+                                    'doc', 'docx'      => 'DOC',
+                                    'xls', 'xlsx'      => 'XLS',
+                                    'jpg','jpeg','png'  => 'IMG',
+                                    default            => strtoupper($ext),
                                 };
                                 $color = match($ext) {
-                                    'pdf'           => '#e53935',
-                                    'doc', 'docx'   => '#1565c0',
-                                    'xls', 'xlsx'   => '#2e7d32',
-                                    default         => '#607d8b',
+                                    'pdf'              => '#e53935',
+                                    'doc', 'docx'      => '#1565c0',
+                                    'xls', 'xlsx'      => '#2e7d32',
+                                    default            => '#607d8b',
                                 };
                             @endphp
                             <tr>
@@ -221,7 +223,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="empty-card">No files uploaded</td>
+                                <td colspan="3" class="empty-card">No files uploaded.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -229,7 +231,7 @@
             </div>
         </div>
 
-        {{-- ✅ SIGNED DOCUMENT FROM APPROVER --}}
+        {{-- SIGNED DOCUMENT FROM APPROVER --}}
         <div class="panel">
             <div class="panel-header">Signed Document from Approver</div>
             <div class="table-wrap">
@@ -272,7 +274,7 @@
     {{-- RIGHT --}}
     <div style="display:flex;flex-direction:column;gap:14px;">
 
-        {{-- META --}}
+        {{-- REQUEST INFO --}}
         <div class="panel">
             <div class="panel-header">Request Info</div>
             <div class="panel-body">
@@ -307,7 +309,7 @@
                     </div>
                 </div>
             @empty
-                <div class="empty-card">No lifecycle yet</div>
+                <div class="empty-card">No lifecycle yet.</div>
             @endforelse
         </div>
 
